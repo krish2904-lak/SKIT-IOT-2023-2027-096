@@ -24,6 +24,14 @@
 | **External Evaluation** | Research Paper Publication |
 
 ---
+# 👥 Team Members
+
+| S. No. | Team Member |
+|--------|-------------|
+| 1 | Nishant Kumar |
+| 2 | Lakshya Jain |
+| 3 | Poonchi Bhardwaj |
+| 4 | Saloni Jain |
 
 # 🧠 About The Project
 
