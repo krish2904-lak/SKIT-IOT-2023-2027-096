@@ -28,7 +28,7 @@
 
 | S. No. | Team Member |
 |--------|-------------|
-| 1 | Nishant Kumar |
+| 1 | Nishant Kumawat|
 | 2 | Lakshya Jain |
 | 3 | Prachi Bhardwaj |
 | 4 | Saloni Jain |
