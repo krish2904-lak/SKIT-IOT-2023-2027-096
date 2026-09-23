@@ -1,0 +1,10 @@
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+
+# Generated reports
+F-096_Weekly_Progress_Report_Form-*.pdf
+generate_report.py
