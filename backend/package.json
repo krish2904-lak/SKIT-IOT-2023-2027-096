@@ -1,0 +1,29 @@
+{
+  "name": "f096-backend",
+  "version": "1.0.0",
+  "description": "Backend architecture for AI Based Tech-Stack Recommendation with ERP Integration",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [
+    "ai",
+    "erp",
+    "recommendation",
+    "backend",
+    "nodejs",
+    "express"
+  ],
+  "author": "F-096 Team",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  },
+  "type": "commonjs"
+}
