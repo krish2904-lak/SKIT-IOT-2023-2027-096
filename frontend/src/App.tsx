@@ -1,99 +1,48 @@
-import { DashboardProvider, useDashboard } from './context/DashboardContext';
+import { useState } from 'react';
 import { DashboardLayout } from './components/layout/DashboardLayout';
-import { OverviewPage } from './pages/OverviewPage';
-import { ProfileErpPage } from './pages/ProfileErpPage';
-import { InputFormPage } from './pages/InputFormPage';
-import { RecommendationsPage } from './pages/RecommendationsPage';
-import { HistoryPage } from './pages/HistoryPage';
+import { OverviewView } from './views/OverviewView';
+import { ProfileInputView } from './views/ProfileInputView';
+import { RecommendationsView } from './views/RecommendationsView';
 import { ExplanationView } from './views/ExplanationView';
+import { mockStudentProfile } from './mocks/student';
+import { mockRecommendations } from './mocks/recommendation';
 import { mockExplanation } from './mocks/explanation';
+import type { DashboardTab } from './types';
 
-function DashboardContent() {
-  const {
-    activeTab,
-    setActiveTab,
-    student,
-    recommendations,
-    explanation,
-    history,
-    isSyncingErp,
-    isSubmittingInput,
-    isLoadingRecs,
-    syncNotification,
-    handleSyncErp,
-    handleSubmitInputs,
-    handleSelectStackForExplanation,
-    handleSaveToHistory,
-  } = useDashboard();
+export default function App() {
+  const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
 
   return (
     <DashboardLayout
       activeTab={activeTab}
       onTabChange={setActiveTab}
-      student={student}
-      isSyncingErp={isSyncingErp}
-      onSyncErp={handleSyncErp}
-      syncNotification={syncNotification}
-      onTriggerRec={() => setActiveTab('recommendations')}
+      student={mockStudentProfile}
     >
       {activeTab === 'overview' && (
-        <OverviewPage
-          student={student}
-          topRecommendation={recommendations[0]}
+        <OverviewView
+          student={mockStudentProfile}
+          topRecommendation={mockRecommendations[0]}
           onNavigate={setActiveTab}
-          onTriggerRec={() => setActiveTab('recommendations')}
-          isLoadingRecs={isLoadingRecs}
-        />
-      )}
-
-      {activeTab === 'erp-profile' && (
-        <ProfileErpPage
-          student={student}
-          onRefreshSync={handleSyncErp}
-          isSyncing={isSyncingErp}
         />
       )}
 
       {activeTab === 'profile-input' && (
-        <InputFormPage
-          student={student}
-          onSubmit={handleSubmitInputs}
-          isSubmitting={isSubmittingInput}
-        />
+        <ProfileInputView student={mockStudentProfile} />
       )}
 
       {activeTab === 'recommendations' && (
-        <RecommendationsPage
-          recommendations={recommendations}
-          explanation={explanation}
-          onSelectStackForExplanation={handleSelectStackForExplanation}
-          onSaveToHistory={handleSaveToHistory}
+        <RecommendationsView
+          recommendations={mockRecommendations}
           onNavigate={setActiveTab}
         />
       )}
 
       {activeTab === 'explanation' && (
         <ExplanationView
-          explanation={explanation ?? mockExplanation}
+          explanation={mockExplanation}
           onNavigate={setActiveTab}
-        />
-      )}
-
-      {activeTab === 'history' && (
-        <HistoryPage
-          history={history}
-          onNavigate={setActiveTab}
-          onTriggerRec={() => setActiveTab('recommendations')}
         />
       )}
     </DashboardLayout>
-  );
-}
-
-export default function App() {
-  return (
-    <DashboardProvider>
-      <DashboardContent />
-    </DashboardProvider>
   );
 }
