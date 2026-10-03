@@ -1,0 +1,23 @@
+{
+  "name": "f-096-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Node.js and Express API foundation for F-096",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "seed": "node scripts/seed.js"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "mongoose": "^9.10.3",
+    "morgan": "^1.10.0"
+  }
+}
