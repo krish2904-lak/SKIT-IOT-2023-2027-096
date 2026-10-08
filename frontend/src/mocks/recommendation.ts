@@ -8,7 +8,7 @@ export const mockRecommendations: RecommendationItem[] = [
     matchScore: 94,
     difficulty: 'Intermediate',
     estimatedTimeToLearn: '8-10 Weeks',
-    targetRoles: ['Full-Stack Developer', 'Frontend Engineer', 'Web Applications Specialist'],
+    targetRoles: ['Full-Stack Developer', 'Frontend Engineer', 'Web Applications Specialist', 'Cloud Solutions Associate'],
     technologies: [
       { name: 'React.js', category: 'Frontend' },
       { name: 'TypeScript', category: 'Frontend' },
@@ -17,8 +17,31 @@ export const mockRecommendations: RecommendationItem[] = [
       { name: 'MongoDB', category: 'Database' },
       { name: 'Docker & AWS Basics', category: 'DevOps' },
     ],
-    whyRecommendedSnippet: 'High alignment with your strong JavaScript foundation and Web Tech academic grade.',
+    whyRecommendedSnippet: 'Highest compatibility: 95% Web Dev Lab score, declared Cloud interest, and solid JavaScript foundation.',
     rank: 1,
+    roadmap: [
+      {
+        phase: 'Phase 1: Architecture & UI Engineering',
+        duration: 'Weeks 1-3',
+        title: 'Modern TypeScript + React 19 Ecosystem',
+        topics: ['Custom Hooks & Context State', 'Tailwind Utility Architecture', 'Client Performance & Vite Bundling'],
+        recommendedResource: 'SKIT Web Dev Lab Manual & FullStackOpen Part 1-5',
+      },
+      {
+        phase: 'Phase 2: RESTful Microservices & Persistence',
+        duration: 'Weeks 4-6',
+        title: 'Node.js Express + MongoDB Atlas Integration',
+        topics: ['JWT Authentication', 'Mongoose Schema Design', 'Microservice API Gateways'],
+        recommendedResource: 'Official Node.js Docs & MongoDB University M220JS',
+      },
+      {
+        phase: 'Phase 3: Cloud Native Deployment & DevOps',
+        duration: 'Weeks 7-9',
+        title: 'Containerization with Docker & Cloud Hosting',
+        topics: ['Multi-Stage Dockerfiles', 'GitHub Actions CI/CD Pipeline', 'AWS EC2 / Vercel Production Deployments'],
+        recommendedResource: 'Docker Deep Dive & AWS Academy Cloud Foundations',
+      },
+    ],
   },
   {
     id: 'rec-002',
@@ -37,6 +60,29 @@ export const mockRecommendations: RecommendationItem[] = [
     ],
     whyRecommendedSnippet: 'Leverages your CSE-IoT branch coursework, Sensors & Protocols grades, and real-time dashboard interest.',
     rank: 2,
+    roadmap: [
+      {
+        phase: 'Phase 1: Sensor Interfacing & Protocols',
+        duration: 'Weeks 1-4',
+        title: 'Microcontroller Programming & MQTT Brokers',
+        topics: ['ESP32 / Arduino C++', 'MQTT Publish/Subscribe', 'Sensor Calibration (DHT22, Ultrasonic)'],
+        recommendedResource: 'SKIT IoT Lab Syllabus (Sem 5-6)',
+      },
+      {
+        phase: 'Phase 2: Stream Ingestion & Time-Series DB',
+        duration: 'Weeks 5-8',
+        title: 'InfluxDB + Node-RED Data Pipeline',
+        topics: ['Telegraf Agents', 'Flux Queries', 'Edge-to-Cloud Telemetry Streams'],
+        recommendedResource: 'InfluxData IoT Architecture Guides',
+      },
+      {
+        phase: 'Phase 3: Telemetry Visualization Web Client',
+        duration: 'Weeks 9-11',
+        title: 'WebSocket Live Dashboards',
+        topics: ['Real-Time Canvas Graphs', 'Device Alert Thresholds', 'Hardware-in-the-Loop Capstone'],
+        recommendedResource: 'React + WebSockets IoT Showcase Tutorials',
+      },
+    ],
   },
   {
     id: 'rec-003',
@@ -55,5 +101,28 @@ export const mockRecommendations: RecommendationItem[] = [
     ],
     whyRecommendedSnippet: 'Builds on your analytical academic standing and expands your Python skill toward deployable AI services.',
     rank: 3,
+    roadmap: [
+      {
+        phase: 'Phase 1: Supervised ML & Feature Engineering',
+        duration: 'Weeks 1-4',
+        title: 'Random Forest & TreeSHAP Mathematics',
+        topics: ['Data Imputation & MinMax Scaling', 'Cross-Validation & Hyperparameter Tuning', 'SHAP Waterfall Plots'],
+        recommendedResource: 'scikit-learn user guide & Lundberg SHAP documentation',
+      },
+      {
+        phase: 'Phase 2: High-Performance Model Serving',
+        duration: 'Weeks 5-8',
+        title: 'FastAPI Asynchronous Microservice',
+        topics: ['Pydantic Data Contracts', 'Joblib Model Serialization', 'Sub-50ms Inference Endpoints'],
+        recommendedResource: 'FastAPI in Production by Sebastián Ramírez',
+      },
+      {
+        phase: 'Phase 3: Full-Stack XAI Integration',
+        duration: 'Weeks 9-12',
+        title: 'Explainable AI Consumer Client',
+        topics: ['Visualizing TreeSHAP in React', 'Feedback Loops & Drift Detection', 'Docker Container Deployment'],
+        recommendedResource: 'Explainable Machine Learning in Practice (Springer)',
+      },
+    ],
   },
 ];

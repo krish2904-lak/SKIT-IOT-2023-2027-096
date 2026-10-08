@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import type { ErpCourseRecord } from '../../types';
+import type { ErpCourseRecord, SemesterSgpaRecord } from '../../types';
 
 interface AcademicRecordsTableProps {
   courses?: ErpCourseRecord[];
+  sgpaHistory?: SemesterSgpaRecord[];
   cgpa: number;
   rollNumber: string;
   semester: number;
@@ -13,6 +14,7 @@ interface AcademicRecordsTableProps {
 
 export const AcademicRecordsTable: React.FC<AcademicRecordsTableProps> = ({
   courses = [],
+  sgpaHistory = [],
   cgpa,
   rollNumber,
   semester,
@@ -40,6 +42,8 @@ export const AcademicRecordsTable: React.FC<AcademicRecordsTableProps> = ({
         return 'bg-slate-100 text-slate-800 border-slate-300';
     }
   };
+
+  const totalCreditsEarned = sgpaHistory.reduce((acc, curr) => acc + curr.creditsCompleted, 0);
 
   return (
     <div className="space-y-6">
@@ -99,13 +103,14 @@ export const AcademicRecordsTable: React.FC<AcademicRecordsTableProps> = ({
 
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
           <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider block">
-            Active Semester
+            Degree Credits Earned
           </span>
           <div className="mt-1 flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-slate-900 font-mono">Sem {semester}</span>
+            <span className="text-2xl font-bold text-slate-900 font-mono">{totalCreditsEarned || 124}</span>
+            <span className="text-xs text-slate-400 font-medium">/ 160 B.Tech</span>
           </div>
           <span className="inline-block mt-2 text-[10px] text-blue-700 bg-blue-50 px-2 py-0.5 rounded font-medium border border-blue-200">
-            Third Year (2025–26)
+            77.5% Degree Complete
           </span>
         </div>
 
@@ -117,7 +122,7 @@ export const AcademicRecordsTable: React.FC<AcademicRecordsTableProps> = ({
             <span className="text-2xl font-bold text-slate-900 font-mono">89.4%</span>
           </div>
           <span className="inline-block mt-2 text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-medium border border-emerald-200">
-            Above 75% Threshold
+            Eligible for Exams (&gt;75%)
           </span>
         </div>
 
@@ -134,6 +139,55 @@ export const AcademicRecordsTable: React.FC<AcademicRecordsTableProps> = ({
         </div>
       </div>
 
+      {/* NEW FEATURE: Semester-by-Semester SGPA Progression Trend */}
+      {sgpaHistory.length > 0 && (
+        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+            <div>
+              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">
+                Academic Trajectory Analytics
+              </span>
+              <h4 className="text-sm font-bold text-slate-900 mt-0.5">
+                Semester-by-Semester SGPA Progression
+              </h4>
+            </div>
+            <span className="text-xs text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 font-semibold font-mono">
+              +0.60 SGPA Overall Gain
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-1">
+            {sgpaHistory.map((item) => {
+              const heightPercentage = Math.round(((item.sgpa - 7.0) / 3.0) * 100);
+              return (
+                <div
+                  key={item.semester}
+                  className="bg-slate-50 rounded-xl p-3 border border-slate-200 text-center flex flex-col justify-between"
+                >
+                  <span className="text-[11px] font-bold text-slate-500 uppercase">
+                    Sem {item.semester}
+                  </span>
+                  <div className="my-3">
+                    <div className="w-8 mx-auto bg-slate-200 rounded-full h-16 flex items-end p-0.5 overflow-hidden">
+                      <div
+                        className="w-full bg-blue-600 rounded-full transition-all duration-700"
+                        style={{ height: `${heightPercentage}%` }}
+                      />
+                    </div>
+                    <span className="text-sm font-bold font-mono text-slate-900 block mt-1.5">
+                      {item.sgpa.toFixed(2)}
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-slate-500 block truncate" title={item.highlightCourse}>
+                    {item.highlightCourse}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Semester Coursework Table */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
         <div className="p-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -149,9 +203,9 @@ export const AcademicRecordsTable: React.FC<AcademicRecordsTableProps> = ({
             <button
               type="button"
               onClick={() => setSelectedSemester(0)}
-              className={`px-2.5 py-1 text-xs font-medium rounded-md transition ${
+              className={`px-2.5 py-1 text-xs font-medium rounded-md transition cursor-pointer ${
                 selectedSemester === 0
-                  ? 'bg-white text-slate-900 shadow-xs'
+                  ? 'bg-white text-slate-900 shadow-xs font-semibold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -160,9 +214,9 @@ export const AcademicRecordsTable: React.FC<AcademicRecordsTableProps> = ({
             <button
               type="button"
               onClick={() => setSelectedSemester(5)}
-              className={`px-2.5 py-1 text-xs font-medium rounded-md transition ${
+              className={`px-2.5 py-1 text-xs font-medium rounded-md transition cursor-pointer ${
                 selectedSemester === 5
-                  ? 'bg-white text-slate-900 shadow-xs'
+                  ? 'bg-white text-slate-900 shadow-xs font-semibold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -171,9 +225,9 @@ export const AcademicRecordsTable: React.FC<AcademicRecordsTableProps> = ({
             <button
               type="button"
               onClick={() => setSelectedSemester(4)}
-              className={`px-2.5 py-1 text-xs font-medium rounded-md transition ${
+              className={`px-2.5 py-1 text-xs font-medium rounded-md transition cursor-pointer ${
                 selectedSemester === 4
-                  ? 'bg-white text-slate-900 shadow-xs'
+                  ? 'bg-white text-slate-900 shadow-xs font-semibold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >

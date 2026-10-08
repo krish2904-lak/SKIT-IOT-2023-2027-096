@@ -1,48 +1,110 @@
-import { useState } from 'react';
+import { DashboardProvider, useDashboard } from './context/DashboardContext';
 import { DashboardLayout } from './components/layout/DashboardLayout';
-import { OverviewView } from './views/OverviewView';
-import { ProfileInputView } from './views/ProfileInputView';
-import { RecommendationsView } from './views/RecommendationsView';
+import { OverviewPage } from './pages/OverviewPage';
+import { ProfileErpPage } from './pages/ProfileErpPage';
+import { InputFormPage } from './pages/InputFormPage';
+import { RecommendationsPage } from './pages/RecommendationsPage';
+import { ComparePage } from './pages/ComparePage';
+import { HistoryPage } from './pages/HistoryPage';
 import { ExplanationView } from './views/ExplanationView';
-import { mockStudentProfile } from './mocks/student';
-import { mockRecommendations } from './mocks/recommendation';
 import { mockExplanation } from './mocks/explanation';
-import type { DashboardTab } from './types';
 
-export default function App() {
-  const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
+function DashboardContent() {
+  const {
+    activeTab,
+    setActiveTab,
+    student,
+    recommendations,
+    explanation,
+    history,
+    isSyncingErp,
+    isSubmittingInput,
+    isLoadingRecs,
+    syncNotification,
+    handleSyncErp,
+    handleSubmitInputs,
+    handleSelectStackForExplanation,
+    handleSaveToHistory,
+  } = useDashboard();
 
   return (
     <DashboardLayout
       activeTab={activeTab}
       onTabChange={setActiveTab}
-      student={mockStudentProfile}
+      student={student}
+      isSyncingErp={isSyncingErp}
+      onSyncErp={handleSyncErp}
+      syncNotification={syncNotification}
+      onTriggerRec={() => setActiveTab('recommendations')}
+      topRecommendation={recommendations[0]}
+      explanation={explanation}
     >
       {activeTab === 'overview' && (
-        <OverviewView
-          student={mockStudentProfile}
-          topRecommendation={mockRecommendations[0]}
+        <OverviewPage
+          student={student}
+          topRecommendation={recommendations[0]}
           onNavigate={setActiveTab}
+          onTriggerRec={() => setActiveTab('recommendations')}
+          isLoadingRecs={isLoadingRecs}
+        />
+      )}
+
+      {activeTab === 'erp-profile' && (
+        <ProfileErpPage
+          student={student}
+          onRefreshSync={handleSyncErp}
+          isSyncing={isSyncingErp}
         />
       )}
 
       {activeTab === 'profile-input' && (
-        <ProfileInputView student={mockStudentProfile} />
+        <InputFormPage
+          student={student}
+          onSubmit={handleSubmitInputs}
+          isSubmitting={isSubmittingInput}
+        />
       )}
 
       {activeTab === 'recommendations' && (
-        <RecommendationsView
-          recommendations={mockRecommendations}
+        <RecommendationsPage
+          recommendations={recommendations}
+          explanation={explanation}
+          onSelectStackForExplanation={handleSelectStackForExplanation}
+          onSaveToHistory={handleSaveToHistory}
           onNavigate={setActiveTab}
+        />
+      )}
+
+      {activeTab === 'compare' && (
+        <ComparePage
+          recommendations={recommendations}
+          onNavigate={setActiveTab}
+          onSelectStackForExplanation={handleSelectStackForExplanation}
         />
       )}
 
       {activeTab === 'explanation' && (
         <ExplanationView
-          explanation={mockExplanation}
+          explanation={explanation ?? mockExplanation}
           onNavigate={setActiveTab}
         />
       )}
+
+      {activeTab === 'history' && (
+        <HistoryPage
+          history={history}
+          onNavigate={setActiveTab}
+          onTriggerRec={() => setActiveTab('recommendations')}
+        />
+      )}
     </DashboardLayout>
+  );
+}
+
+export default function App() {
+  return (
+    <DashboardProvider>
+      <DashboardContent />
+    </DashboardProvider>
   );
 }
