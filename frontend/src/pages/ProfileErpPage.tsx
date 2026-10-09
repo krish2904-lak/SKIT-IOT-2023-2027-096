@@ -67,9 +67,10 @@ export const ProfileErpPage: React.FC<ProfileErpPageProps> = ({
         </div>
       </div>
 
-      {/* Coursework & Lab Performance Table */}
+      {/* Coursework & Lab Performance Table + SGPA Trend */}
       <AcademicRecordsTable
         courses={student.erpCourses}
+        sgpaHistory={student.sgpaHistory}
         cgpa={student.cgpa}
         rollNumber={student.erpStudentId}
         semester={student.semester}

@@ -17,8 +17,24 @@ export const ShapWaterfallChart: React.FC<ShapWaterfallChartProps> = ({
   stackTitle,
 }) => {
   const [activeFactor, setActiveFactor] = useState<FeatureImpact | null>(null);
+  const [filterCategory, setFilterCategory] = useState<'ALL' | 'ERP' | 'SKILLS' | 'GAPS'>('ALL');
+  const [bridgedFeatures, setBridgedFeatures] = useState<string[]>([]);
 
-  // Maximum value for proportional width calculations
+  // Calculate potential score boost from simulated bridged gaps
+  const boostSum = bridgedFeatures.reduce((acc, featName) => {
+    const factor = negativeFactors.find((f) => f.featureName === featName);
+    return acc + (factor?.potentialBoost ?? 3.5);
+  }, 0);
+
+  const simulatedScore = Math.min(99, Math.round(finalScore + boostSum));
+
+  const toggleBridgeGap = (featureName: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setBridgedFeatures((prev) =>
+      prev.includes(featureName) ? prev.filter((f) => f !== featureName) : [...prev, featureName]
+    );
+  };
+
   const maxAbsValue = Math.max(
     ...positiveFactors.map((f) => Math.abs(f.shapValue)),
     ...negativeFactors.map((f) => Math.abs(f.shapValue)),
@@ -38,6 +54,20 @@ export const ShapWaterfallChart: React.FC<ShapWaterfallChartProps> = ({
     }
   };
 
+  const filteredPositive = positiveFactors.filter((f) => {
+    if (filterCategory === 'ERP') return f.category === 'ERP_ACADEMICS';
+    if (filterCategory === 'SKILLS') return f.category === 'EXISTING_SKILL' || f.category === 'STUDENT_INTEREST';
+    if (filterCategory === 'GAPS') return false;
+    return true;
+  });
+
+  const filteredNegative = negativeFactors.filter((f) => {
+    if (filterCategory === 'ERP') return f.category === 'ERP_ACADEMICS';
+    if (filterCategory === 'SKILLS') return f.category === 'EXISTING_SKILL';
+    if (filterCategory === 'GAPS') return true;
+    return true;
+  });
+
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-3">
@@ -54,92 +84,59 @@ export const ShapWaterfallChart: React.FC<ShapWaterfallChartProps> = ({
           </p>
         </div>
 
-        {/* Prediction Equation Badge */}
+        {/* Prediction Equation Badge with Simulated Score */}
         <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-mono">
-          <span className="text-slate-500">Base: {baseConfidence.toFixed(0)}%</span>
+          <span className="text-slate-500">Base: {(baseConfidence * 100).toFixed(0)}%</span>
           <span className="text-slate-400">→</span>
-          <span className="text-emerald-600 font-bold">+{ (finalScore - baseConfidence).toFixed(1) }%</span>
-          <span className="text-slate-400">=</span>
           <span className="text-blue-700 font-bold">{finalScore.toFixed(0)}% Match</span>
+          {bridgedFeatures.length > 0 && (
+            <span className="text-emerald-700 font-bold bg-emerald-100 px-1.5 py-0.5 rounded text-[11px]">
+              ↑ {simulatedScore}% (Simulated)
+            </span>
+          )}
         </div>
       </div>
 
-      {/* Legend */}
-      <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600 pt-1">
-        <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-xs bg-emerald-500" />
-          <span>Positive Impact (Increases match confidence)</span>
+      {/* Interactive Category Filter Pills */}
+      <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg">
+          {[
+            { id: 'ALL', label: 'All Factors' },
+            { id: 'ERP', label: 'ERP Coursework' },
+            { id: 'SKILLS', label: 'Declared Skills' },
+            { id: 'GAPS', label: 'Gap Remediation' },
+          ].map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => setFilterCategory(cat.id as any)}
+              className={`px-3 py-1 rounded-md font-medium transition cursor-pointer ${
+                filterCategory === cat.id
+                  ? 'bg-white text-slate-900 shadow-xs font-semibold'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-xs bg-amber-500" />
-          <span>Negative / Gap Impact (Reduces match confidence)</span>
+
+        <div className="text-[11px] text-slate-500">
+          Showing <strong className="text-slate-800">{filteredPositive.length + filteredNegative.length}</strong> mathematical parameters
         </div>
       </div>
 
       {/* Waterfall / Horizontal Contribution Bars */}
-      <div className="space-y-4 pt-2">
+      <div className="space-y-4 pt-1">
         {/* Positive Factors Section */}
-        <div>
-          <h4 className="text-xs font-semibold text-emerald-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            Top Positive Drivers ({positiveFactors.length})
-          </h4>
-          <div className="space-y-2.5">
-            {positiveFactors.map((factor) => {
-              const widthPercent = Math.min(
-                100,
-                Math.round((Math.abs(factor.shapValue) / maxAbsValue) * 85) + 15
-              );
-              const cat = getCategoryBadge(factor.category);
-
-              return (
-                <div
-                  key={factor.featureName}
-                  onMouseEnter={() => setActiveFactor(factor)}
-                  className={`p-3 rounded-lg border transition-all cursor-pointer ${
-                    activeFactor?.featureName === factor.featureName
-                      ? 'border-emerald-500 bg-emerald-50/50 shadow-xs'
-                      : 'border-slate-100 hover:border-slate-200 bg-slate-50/60'
-                  }`}
-                >
-                  <div className="flex items-center justify-between text-xs mb-1.5">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-slate-900">{factor.displayName}</span>
-                      <span
-                        className={`text-[10px] px-2 py-0.5 rounded font-medium border ${cat.bg}`}
-                      >
-                        {cat.label}
-                      </span>
-                    </div>
-                    <span className="font-mono font-bold text-emerald-600">
-                      +{(factor.shapValue * 100).toFixed(1)}%
-                    </span>
-                  </div>
-
-                  {/* Horizontal Bar */}
-                  <div className="w-full bg-slate-200/80 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="bg-emerald-500 h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${widthPercent}%` }}
-                    />
-                  </div>
-
-                  <p className="text-[11px] text-slate-500 mt-1.5">{factor.explanationNote}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Negative / Skill Gap Factors Section */}
-        {negativeFactors.length > 0 && (
-          <div className="pt-2">
-            <h4 className="text-xs font-semibold text-amber-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-amber-500" />
-              Negative Drivers & Skill Gaps ({negativeFactors.length})
+        {filteredPositive.length > 0 && (
+          <div>
+            <h4 className="text-xs font-semibold text-emerald-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              Positive Drivers ({filteredPositive.length})
             </h4>
             <div className="space-y-2.5">
-              {negativeFactors.map((factor) => {
+              {filteredPositive.map((factor) => {
                 const widthPercent = Math.min(
                   100,
                   Math.round((Math.abs(factor.shapValue) / maxAbsValue) * 85) + 15
@@ -152,7 +149,7 @@ export const ShapWaterfallChart: React.FC<ShapWaterfallChartProps> = ({
                     onMouseEnter={() => setActiveFactor(factor)}
                     className={`p-3 rounded-lg border transition-all cursor-pointer ${
                       activeFactor?.featureName === factor.featureName
-                        ? 'border-amber-500 bg-amber-50/50 shadow-xs'
+                        ? 'border-emerald-500 bg-emerald-50/50 shadow-xs'
                         : 'border-slate-100 hover:border-slate-200 bg-slate-50/60'
                     }`}
                   >
@@ -165,20 +162,107 @@ export const ShapWaterfallChart: React.FC<ShapWaterfallChartProps> = ({
                           {cat.label}
                         </span>
                       </div>
-                      <span className="font-mono font-bold text-amber-600">
-                        {(factor.shapValue * 100).toFixed(1)}%
+                      <span className="font-mono font-bold text-emerald-600">
+                        +{(factor.shapValue * 100).toFixed(1)}%
                       </span>
                     </div>
 
-                    {/* Horizontal Bar */}
                     <div className="w-full bg-slate-200/80 rounded-full h-2 overflow-hidden">
                       <div
-                        className="bg-amber-500 h-2 rounded-full transition-all duration-500"
+                        className="bg-emerald-500 h-2 rounded-full transition-all duration-500"
                         style={{ width: `${widthPercent}%` }}
                       />
                     </div>
 
                     <p className="text-[11px] text-slate-500 mt-1.5">{factor.explanationNote}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Negative / Skill Gap Factors Section */}
+        {filteredNegative.length > 0 && (
+          <div className="pt-2">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-xs font-semibold text-amber-800 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-amber-500" />
+                Negative Drivers & Skill Gaps ({filteredNegative.length})
+              </h4>
+              <span className="text-[11px] text-slate-500">
+                Click &apos;Simulate Bridge&apos; to view score projection
+              </span>
+            </div>
+
+            <div className="space-y-2.5">
+              {filteredNegative.map((factor) => {
+                const widthPercent = Math.min(
+                  100,
+                  Math.round((Math.abs(factor.shapValue) / maxAbsValue) * 85) + 15
+                );
+                const cat = getCategoryBadge(factor.category);
+                const isBridged = bridgedFeatures.includes(factor.featureName);
+
+                return (
+                  <div
+                    key={factor.featureName}
+                    onMouseEnter={() => setActiveFactor(factor)}
+                    className={`p-3.5 rounded-xl border transition-all ${
+                      isBridged
+                        ? 'border-emerald-300 bg-emerald-50/40 ring-1 ring-emerald-300'
+                        : 'border-amber-200 bg-amber-50/30'
+                    }`}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2 mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-slate-900">{factor.displayName}</span>
+                        <span className={`text-[10px] px-2 py-0.5 rounded font-medium border ${cat.bg}`}>
+                          {cat.label}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-amber-700">
+                          {(factor.shapValue * 100).toFixed(1)}% penalty
+                        </span>
+                        <button
+                          type="button"
+                          onClick={(e) => toggleBridgeGap(factor.featureName, e)}
+                          className={`px-2 py-0.5 rounded text-[11px] font-semibold transition cursor-pointer ${
+                            isBridged
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-xs'
+                          }`}
+                        >
+                          {isBridged ? '✓ Gap Bridged (+Boost)' : '+ Simulate Bridge'}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="w-full bg-slate-200/80 rounded-full h-2 overflow-hidden mb-2">
+                      <div
+                        className={`h-2 rounded-full transition-all duration-500 ${
+                          isBridged ? 'bg-emerald-400' : 'bg-amber-500'
+                        }`}
+                        style={{ width: `${widthPercent}%` }}
+                      />
+                    </div>
+
+                    <p className="text-[11px] text-slate-600 mb-2">{factor.explanationNote}</p>
+
+                    {factor.remedyElective && (
+                      <div className="bg-white/80 border border-amber-200/80 rounded-lg p-2 flex items-center justify-between text-[11px]">
+                        <span className="text-slate-700">
+                          <strong>Recommended Remediation:</strong> {factor.remedyElective}
+                        </span>
+                        {factor.potentialBoost && (
+                          <span className="text-emerald-700 font-mono font-bold shrink-0 ml-2">
+                            +{factor.potentialBoost}% Match Boost
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -197,13 +281,18 @@ export const ShapWaterfallChart: React.FC<ShapWaterfallChartProps> = ({
               clipRule="evenodd"
             />
           </svg>
-          Model Interpretability Takeaway:
+          Academic Interpretability Verdict:
         </div>
         <p className="leading-relaxed text-blue-900">
-          The Random Forest algorithm placed the highest positive weights on your institutional
-          coursework marks in <strong>Web Development Lab (Grade A+)</strong> and{' '}
-          <strong>Database Management Systems</strong>, which aligned with your declared interest in
-          Cloud Systems. Bridging the containerization skill gap will yield optimal role-readiness.
+          The Random Forest algorithm heavily rewarded your institutional performance in{' '}
+          <strong>Web Development Lab (Grade A+)</strong> and <strong>Database Systems</strong>.
+          {bridgedFeatures.length > 0 ? (
+            <span className="block mt-1 text-emerald-800 font-semibold">
+              With your {bridgedFeatures.length} simulated remedial electives completed, your projected compatibility rises to {simulatedScore}%.
+            </span>
+          ) : (
+            ' Taking recommended containerization workshops bridges the top negative factor and elevates career readiness.'
+          )}
         </p>
       </div>
     </div>

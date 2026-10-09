@@ -1,4 +1,78 @@
-import type { StudentProfile } from '../types';
+import type { StudentProfile, ErpCourseRecord, SemesterSgpaRecord } from '../types';
+
+export const mockErpCourses: ErpCourseRecord[] = [
+  {
+    code: '5CS4-04',
+    name: 'Database Management Systems',
+    semester: 5,
+    credits: 3,
+    theoryScore: 84,
+    grade: 'A',
+    attendancePercent: 91.5,
+  },
+  {
+    code: '5CS4-21',
+    name: 'Web Development Lab',
+    semester: 5,
+    credits: 2,
+    practicalScore: 95,
+    grade: 'A+',
+    attendancePercent: 96.0,
+  },
+  {
+    code: '5CS4-05',
+    name: 'Operating Systems',
+    semester: 5,
+    credits: 3,
+    theoryScore: 78,
+    grade: 'B+',
+    attendancePercent: 86.2,
+  },
+  {
+    code: '5CS4-22',
+    name: 'System Software & Operating Systems Lab',
+    semester: 5,
+    credits: 2,
+    practicalScore: 88,
+    grade: 'A',
+    attendancePercent: 92.0,
+  },
+  {
+    code: '4CS4-02',
+    name: 'Design & Analysis of Algorithms',
+    semester: 4,
+    credits: 3,
+    theoryScore: 82,
+    grade: 'A',
+    attendancePercent: 89.0,
+  },
+  {
+    code: '4CS4-03',
+    name: 'Computer Architecture & Organization',
+    semester: 4,
+    credits: 3,
+    theoryScore: 74,
+    grade: 'B+',
+    attendancePercent: 84.5,
+  },
+  {
+    code: '4CS4-21',
+    name: 'Microprocessor & IoT Sensors Lab',
+    semester: 4,
+    credits: 2,
+    practicalScore: 92,
+    grade: 'A+',
+    attendancePercent: 94.0,
+  },
+];
+
+export const mockSgpaHistory: SemesterSgpaRecord[] = [
+  { semester: 1, sgpa: 8.10, creditsCompleted: 24, backlogs: 0, highlightCourse: 'Programming in C & Linux' },
+  { semester: 2, sgpa: 8.25, creditsCompleted: 24, backlogs: 0, highlightCourse: 'Object Oriented Programming' },
+  { semester: 3, sgpa: 8.38, creditsCompleted: 26, backlogs: 0, highlightCourse: 'Data Structures' },
+  { semester: 4, sgpa: 8.54, creditsCompleted: 26, backlogs: 0, highlightCourse: 'IoT Sensors & Embedded Lab' },
+  { semester: 5, sgpa: 8.70, creditsCompleted: 24, backlogs: 0, highlightCourse: 'Web Dev Lab (A+) & DBMS (A)' },
+];
 
 export const mockStudentProfile: StudentProfile = {
   id: 'stu_096_prachi',
@@ -28,7 +102,9 @@ export const mockStudentProfile: StudentProfile = {
   ],
   resumeUploaded: true,
   resumeFileName: 'Prachi_Bhardwaj_Resume_2026.pdf',
-  lastErpSync: '2026-09-15 11:30 AM',
+  lastErpSync: '2026-10-08 11:30 IST',
+  erpCourses: mockErpCourses,
+  sgpaHistory: mockSgpaHistory,
 };
 
 export const emptyStudentProfile: Partial<StudentProfile> = {

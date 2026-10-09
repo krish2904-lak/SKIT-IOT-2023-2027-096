@@ -35,7 +35,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [recommendations, setRecommendations] = useState<RecommendationItem[]>([]);
   const [explanation, setExplanation] = useState<StackExplanation | null>(null);
   const [history, setHistory] = useState<SavedRecommendationHistoryItem[]>([]);
-  const [selectedStackId, setSelectedStackId] = useState<string>('rec_stack_mern_docker');
+  const [selectedStackId, setSelectedStackId] = useState<string>('rec-001');
   const [isSyncingErp, setIsSyncingErp] = useState(false);
   const [isSubmittingInput, setIsSubmittingInput] = useState(false);
   const [isLoadingRecs, setIsLoadingRecs] = useState(false);
@@ -50,7 +50,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           studentApi.getProfile(),
           recommendationApi.getRecommendations(),
           recommendationApi.getHistory(),
-          recommendationApi.getExplanation('rec_stack_mern_docker'),
+          recommendationApi.getExplanation('rec-001'),
         ]);
 
         if (isMounted) {

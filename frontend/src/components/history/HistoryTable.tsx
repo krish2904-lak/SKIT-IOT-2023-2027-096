@@ -71,7 +71,7 @@ export const HistoryTable: React.FC<HistoryTableProps> = ({ history, onSelectRun
                   <td className="px-5 py-3.5 font-semibold text-slate-900">
                     {run.topStackTitle}
                     <div className="flex flex-wrap gap-1 mt-1">
-                      {run.technologiesSummary.map((tech) => (
+                      {run.technologiesSummary.map((tech: string) => (
                         <span
                           key={tech}
                           className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded"
@@ -96,7 +96,7 @@ export const HistoryTable: React.FC<HistoryTableProps> = ({ history, onSelectRun
                     <button
                       type="button"
                       onClick={(e) => handleCopyId(run.id, e)}
-                      className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-[11px] font-medium transition"
+                      className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-[11px] font-medium transition cursor-pointer"
                     >
                       {copiedId === run.id ? 'Copied ID' : 'Copy ID'}
                     </button>
@@ -107,7 +107,7 @@ export const HistoryTable: React.FC<HistoryTableProps> = ({ history, onSelectRun
                           e.stopPropagation();
                           onSelectRun(run);
                         }}
-                        className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-[11px] font-semibold transition"
+                        className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-[11px] font-semibold transition cursor-pointer"
                       >
                         Details
                       </button>
@@ -135,7 +135,7 @@ export const HistoryTable: React.FC<HistoryTableProps> = ({ history, onSelectRun
             <button
               type="button"
               onClick={() => setSelectedItem(null)}
-              className="text-slate-400 hover:text-white p-1 text-xs"
+              className="text-slate-400 hover:text-white p-1 text-xs cursor-pointer"
             >
               ✕ Close
             </button>
@@ -161,7 +161,7 @@ export const HistoryTable: React.FC<HistoryTableProps> = ({ history, onSelectRun
           <div className="pt-2">
             <span className="text-slate-400 block text-[11px] mb-1">Technologies In Stack:</span>
             <div className="flex flex-wrap gap-1.5">
-              {selectedItem.technologiesSummary.map((t) => (
+              {selectedItem.technologiesSummary.map((t: string) => (
                 <span
                   key={t}
                   className="bg-slate-800 text-blue-300 px-2 py-0.5 rounded text-[11px] font-mono border border-slate-700"
