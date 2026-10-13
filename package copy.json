@@ -1,0 +1,11 @@
+{
+  "name": "ai-tech-stack-recommendation-f-096",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-Based Tech-Stack Recommendation with ERP Integration (SKIT/DS/2023-2027/CSE-F-096)",
+  "scripts": {
+    "dev": "npm run dev --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "lint": "npm run lint --prefix frontend"
+  }
+}
