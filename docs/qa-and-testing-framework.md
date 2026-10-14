@@ -3,8 +3,8 @@
 **Author & QA Lead:** Saloni Jain (Data & Testing)  
 **Project ID:** SKIT/DS/2023-2027/CSE-F-096  
 **Mentor:** Dr. Archika Jain  
-**Current Date:** October 09, 2026  
-**Version:** 1.0.0 — Sprints 1–3 Complete  
+**Current Date:** October 14, 2026  
+**Version:** 1.1.0 — Sprint 3 Week 6 Validation Pass  
 
 ---
 
@@ -14,7 +14,7 @@ This document specifies the Quality Assurance (QA) and testing framework develop
 1. **Data Ingestion & Integrity**: Schema compliance and domain range bounds for student academic records and skill vectors.
 2. **Preprocessing Robustness**: Unit tests for normalization, missing field defaults, and canonical skill mappings.
 3. **Model Inference QA**: Monotonicity of Top-K recommendations, score boundary validation, and sub-50ms latency benchmarks.
-4. **API Integration Contracts**: Payload and error status compliance with REST API contracts.
+4. **API Integration Contracts & Edge Cases**: Payload contracts, boundary score behavior, cold-start fallback resilience, and error mapping compliance.
 
 ---
 
@@ -29,7 +29,9 @@ This document specifies the Quality Assurance (QA) and testing framework develop
 │ test_dataset_schema.py   │ Schema & Bounds     │ 4 / 4        │
 │ test_preprocessing_qa.py │ Normalization & QA  │ 5 / 5        │
 │ test_model_inference_qa.py│ Prediction & Latency│ 5 / 5        │
-│ test_api_integration_qa.py│ API Contracts & Errs│ 2 / 2        │
+│ test_api_integration_qa.py│ Contracts & Boundaries│ 5 / 5      │
+├──────────────────────────┼─────────────────────┼──────────────┤
+│ TOTAL                    │ Full Pipeline QA    │ 19 / 19      │
 └──────────────────────────┴─────────────────────┴──────────────┘
 ```
 
@@ -57,6 +59,9 @@ This document specifies the Quality Assurance (QA) and testing framework develop
 ### 3.4 API Integration QA (`tests/test_api_integration_qa.py`)
 - Validates adherence to JSON schemas defined in `docs/API_CONTRACT.md`.
 - Asserts error formats provide standard `status`, `code`, and descriptive `message`.
+- **Boundary Conditions:** Verifies extreme academic boundaries (0.0 SGPA, 10.0 CGPA, 100% attendance).
+- **Cold-Start Fallbacks:** Verifies sparse/empty skill profiles return safe baseline recommendations.
+- **Validation Mapping:** Asserts 422 Unprocessable Entity payload structure when mandatory fields are omitted.
 
 ---
 

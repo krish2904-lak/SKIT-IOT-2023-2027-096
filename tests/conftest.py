@@ -1,7 +1,13 @@
-import pytest
+try:
+    import pytest
+    fixture = pytest.fixture
+except ImportError:
+    def fixture(func):
+        return func
+
 from typing import Dict, Any, List
 
-@pytest.fixture
+@fixture
 def sample_erp_record() -> Dict[str, Any]:
     """Fixture providing a mock academic ERP record for testing."""
     return {
@@ -20,7 +26,7 @@ def sample_erp_record() -> Dict[str, Any]:
         "web_tech_marks": 91
     }
 
-@pytest.fixture
+@fixture
 def sample_student_input() -> Dict[str, Any]:
     """Fixture providing student preferences, skills, and portfolio input."""
     return {
@@ -40,7 +46,7 @@ def sample_student_input() -> Dict[str, Any]:
         "preferred_work_style": "collaborative"
     }
 
-@pytest.fixture
+@fixture
 def expected_tech_stacks() -> List[str]:
     """Fixture listing the 7 target technology stack classes."""
     return [

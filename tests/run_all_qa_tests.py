@@ -19,6 +19,8 @@ def run_tests_native():
     print("  Lead: Saloni Jain (Data & Testing)")
     print("=" * 70)
 
+    start_total = time.perf_counter()
+
     # 1. Test Dataset Schema
     print("\n[SUITE 1/4] Running Dataset Schema & Invariant Tests...")
     from tests.test_dataset_schema import TestDatasetSchema
@@ -73,16 +75,21 @@ def run_tests_native():
     print("  -> 5/5 model inference & latency benchmark checks PASSED.")
 
     # 4. Test API Integration QA
-    print("\n[SUITE 4/4] Running API Contract Integration Tests...")
+    print("\n[SUITE 4/4] Running API Contract Integration & Edge Case Tests...")
     from tests.test_api_integration_qa import TestApiIntegrationQA
     api_suite = TestApiIntegrationQA()
     api_suite.test_mock_recommendation_response_contract()
     api_suite.test_error_response_contract()
-    print("  -> 2/2 API contract checks PASSED.")
+    api_suite.test_boundary_score_recommendation_contract()
+    api_suite.test_sparse_cold_start_profile_contract()
+    api_suite.test_missing_mandatory_field_error_mapping()
+    print("  -> 5/5 API contract & boundary checks PASSED.")
 
+    total_time = (time.perf_counter() - start_total) * 1000
     print("\n" + "=" * 70)
-    print("  SUMMARY: 16/16 QA TESTS PASSED SUCCESSFULLY (100% PASS RATE)")
-    print("  Status: All data validation & model QA checks verified.")
+    print(f"  SUMMARY: 19/19 QA TESTS PASSED SUCCESSFULLY (100% PASS RATE)")
+    print(f"  Execution Time: {total_time:.2f} ms")
+    print("  Status: All data validation, model QA & API contract checks verified.")
     print("=" * 70)
     return 0
 

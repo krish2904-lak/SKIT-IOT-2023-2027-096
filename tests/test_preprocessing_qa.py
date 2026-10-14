@@ -1,4 +1,7 @@
-import pytest
+try:
+    import pytest
+except ImportError:
+    pytest = None
 from typing import Dict, Any, List
 
 class MockStudentPreprocessor:
