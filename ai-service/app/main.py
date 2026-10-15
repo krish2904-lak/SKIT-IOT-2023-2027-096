@@ -11,8 +11,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from .schemas import (
     StudentProfileRequest,
     RecommendationResponse,
+    StackExplanationResponse,
+    ExplanationRequest,
 )
 from model.recommendation.predictor import TechStackPredictor
+from model.recommendation.explainability import TechStackExplainer
 from model.recommendation.tech_stacks import TECH_STACK_CATALOG
 
 app = FastAPI(
@@ -98,4 +101,36 @@ def recommend_tech_stack(profile: StudentProfileRequest) -> Dict[str, Any]:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=f"Inference error: {str(e)}",
+        )
+
+
+@app.post(
+    "/api/v1/explain",
+    response_model=StackExplanationResponse,
+    status_code=status.HTTP_200_OK,
+)
+def explain_tech_stack_recommendation(request: ExplanationRequest) -> Dict[str, Any]:
+    """
+    Computes explainability insights (SHAP factor impacts, positive drivers,
+    bridgeable gaps, remedies, and prerequisites) for a student profile.
+    """
+    try:
+        explainer = TechStackExplainer.get_instance()
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Explainability engine unavailable: {str(e)}",
+        )
+
+    student_data = request.profile.model_dump()
+    try:
+        explanation = explainer.explain_recommendation(
+            student_data,
+            stack_code=request.stack_code,
+        )
+        return explanation
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Explanation generation error: {str(e)}",
         )
