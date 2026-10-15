@@ -48,6 +48,14 @@ class TechItem(BaseModel):
     description: Optional[str] = None
 
 
+class RoadmapStepSchema(BaseModel):
+    phase: str
+    duration: str
+    title: str
+    topics: List[str]
+    recommendedResource: str
+
+
 class RecommendationItemResponse(BaseModel):
     id: str
     stack_code: str
@@ -60,6 +68,7 @@ class RecommendationItemResponse(BaseModel):
     technologies: List[TechItem]
     whyRecommendedSnippet: str
     rank: int
+    roadmap: Optional[List[RoadmapStepSchema]] = None
 
 
 class RecommendationResponse(BaseModel):

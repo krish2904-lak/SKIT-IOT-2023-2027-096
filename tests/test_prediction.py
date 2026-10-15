@@ -75,3 +75,21 @@ def test_batch_prediction(predictor, sample_profiles):
     assert len(batch_results) == 3
     for r in batch_results:
         assert r["primary_recommendation"] is not None
+
+
+def test_predict_includes_roadmap(predictor, sample_profiles):
+    student = sample_profiles[0]
+    rec = predictor.predict_for_student(student, top_k=3)
+    primary = rec["primary_recommendation"]
+    assert "roadmap" in primary
+    roadmap = primary["roadmap"]
+    assert isinstance(roadmap, list)
+    assert len(roadmap) == 3
+    for step in roadmap:
+        assert "phase" in step
+        assert "duration" in step
+        assert "title" in step
+        assert isinstance(step["topics"], list)
+        assert len(step["topics"]) > 0
+        assert "recommendedResource" in step
+

@@ -79,6 +79,8 @@ def test_recommendation_endpoint_valid_payload():
     assert data["primary_recommendation"]["rank"] == 1
     assert data["primary_recommendation"]["matchScore"] > 70.0
     assert len(data["alternative_recommendations"]) == 2
+    assert "roadmap" in data["primary_recommendation"]
+    assert len(data["primary_recommendation"]["roadmap"]) == 3
 
 
 def test_recommendation_minimal_payload():
@@ -94,3 +96,5 @@ def test_recommendation_minimal_payload():
     assert response.status_code == 200
     data = response.json()
     assert data["primary_recommendation"]["stack_code"] == "MERN_FULL_STACK"
+    assert "roadmap" in data["primary_recommendation"]
+    assert len(data["primary_recommendation"]["roadmap"]) == 3
