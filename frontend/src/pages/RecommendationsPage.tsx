@@ -19,28 +19,59 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
   onNavigate,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [searchKeyword, setSearchKeyword] = useState<string>('');
+  const [sortBy, setSortBy] = useState<'MATCH' | 'PREP' | 'RANK'>('MATCH');
   const [activeStackId, setActiveStackId] = useState<string>(
     recommendations[0]?.id ?? 'rec-001'
   );
   const [savedStackIds, setSavedStackIds] = useState<string[]>([]);
+  const [savedFeedback, setSavedFeedback] = useState<string | null>(null);
+  const [isCopiedRoadmap, setIsCopiedRoadmap] = useState(false);
   const [showShapInline, setShowShapInline] = useState(true);
   const [activeSubTab, setActiveSubTab] = useState<'DETAILS' | 'ROADMAP'>('DETAILS');
 
   const categories = ['All', 'Full-Stack Web', 'AI / ML', 'IoT'];
 
-  const filtered =
-    selectedCategory === 'All'
-      ? recommendations
-      : recommendations.filter((r) => r.category.toLowerCase().includes(selectedCategory.toLowerCase()));
+  const filtered = recommendations
+    .filter((r) => {
+      const matchCat =
+        selectedCategory === 'All' ||
+        r.category.toLowerCase().includes(selectedCategory.toLowerCase());
+      const query = searchKeyword.toLowerCase();
+      const matchSearch =
+        !query ||
+        r.title.toLowerCase().includes(query) ||
+        r.whyRecommendedSnippet.toLowerCase().includes(query) ||
+        r.technologies.some((t) => t.name.toLowerCase().includes(query)) ||
+        r.targetRoles.some((role) => role.toLowerCase().includes(query));
+      return matchCat && matchSearch;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'MATCH') return b.matchScore - a.matchScore;
+      if (sortBy === 'PREP') return a.estimatedTimeToLearn.localeCompare(b.estimatedTimeToLearn);
+      return a.rank - b.rank;
+    });
 
   const currentStack =
-    recommendations.find((r) => r.id === activeStackId) ?? recommendations[0];
+    recommendations.find((r) => r.id === activeStackId) ?? filtered[0] ?? recommendations[0];
 
   const handleBookmark = async (stack: RecommendationItem) => {
     if (!savedStackIds.includes(stack.id)) {
       await onSaveToHistory(stack);
       setSavedStackIds((prev) => [...prev, stack.id]);
+      setSavedFeedback(`"${stack.title.split('(')[0]}" saved to your Career History!`);
+      setTimeout(() => setSavedFeedback(null), 3000);
     }
+  };
+
+  const handleCopyRoadmap = () => {
+    if (!currentStack || !currentStack.roadmap) return;
+    const text = currentStack.roadmap
+      .map((r, i) => `${i + 1}. [${r.duration}] ${r.title} - ${r.topics.join(', ')} (Resource: ${r.recommendedResource})`)
+      .join('\n\n');
+    navigator.clipboard.writeText(`Learning Roadmap for ${currentStack.title}:\n\n${text}`);
+    setIsCopiedRoadmap(true);
+    setTimeout(() => setIsCopiedRoadmap(false), 2500);
   };
 
   const handleSelectStack = (stack: RecommendationItem) => {
@@ -65,6 +96,36 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          {/* Live Search input */}
+          <div className="relative">
+            <input
+              type="text"
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              placeholder="Search tech, stack, or role..."
+              className="pl-7 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 w-44 sm:w-52 transition"
+            />
+            <svg
+              className="w-3.5 h-3.5 text-slate-400 absolute left-2 top-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+
+          {/* Sort selector */}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as any)}
+            className="px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+          >
+            <option value="MATCH">Sort: Highest Match</option>
+            <option value="RANK">Sort: Default Rank</option>
+            <option value="PREP">Sort: Fast Prep Time</option>
+          </select>
+
           {/* Compare Button */}
           <button
             type="button"
@@ -74,19 +135,19 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
             </svg>
-            Compare Stacks Matrix
+            Compare Matrix
           </button>
 
           {/* Category Filters */}
-          <div className="flex flex-wrap items-center gap-1.5 bg-slate-100 p-1 rounded-lg">
+          <div className="flex flex-wrap items-center gap-1 bg-slate-100 p-0.5 rounded-lg">
             {categories.map((cat) => (
               <button
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-md transition cursor-pointer ${
+                className={`px-2.5 py-1 text-xs font-medium rounded-md transition cursor-pointer ${
                   selectedCategory === cat
-                    ? 'bg-white text-slate-900 shadow-xs font-semibold'
+                    ? 'bg-white text-slate-900 shadow-2xs font-semibold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -97,12 +158,34 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
         </div>
       </div>
 
+      {/* Floating Save Feedback Banner */}
+      {savedFeedback && (
+        <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs px-4 py-2 rounded-xl flex items-center justify-between shadow-xs animate-fade-in">
+          <span className="flex items-center gap-2 font-medium">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            {savedFeedback}
+          </span>
+          <button
+            type="button"
+            onClick={() => onNavigate('history')}
+            className="text-xs text-emerald-700 underline font-semibold hover:text-emerald-900 cursor-pointer"
+          >
+            View History →
+          </button>
+        </div>
+      )}
+
       {/* Main Two-Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Stack Cards List (col-span-5) */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            {filtered.length} Evaluated Recommendations
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span>{filtered.length} Evaluated Recommendations</span>
+            {searchKeyword && (
+              <span className="text-[11px] text-blue-600 lowercase font-normal">
+                filtered by "{searchKeyword}"
+              </span>
+            )}
           </div>
 
           <div className="space-y-3">
@@ -258,7 +341,27 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
                 <div className="space-y-4 pt-1">
                   <div className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center justify-between">
                     <span>Curriculum & Milestone Execution Pathway</span>
-                    <span className="text-blue-600 font-mono">{currentStack.estimatedTimeToLearn}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-blue-600 font-mono">{currentStack.estimatedTimeToLearn}</span>
+                      <button
+                        type="button"
+                        onClick={handleCopyRoadmap}
+                        className="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 rounded-md border border-slate-200 text-[11px] font-medium transition cursor-pointer flex items-center gap-1 shadow-2xs"
+                      >
+                        {isCopiedRoadmap ? (
+                          <>
+                            <span className="text-emerald-600 font-bold">✓ Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                            </svg>
+                            Copy Plan
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="space-y-3">

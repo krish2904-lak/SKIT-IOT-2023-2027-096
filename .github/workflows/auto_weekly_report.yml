@@ -39,7 +39,7 @@ jobs:
         run: |
           mkdir -p weekly_reports
 
-          mv *_Weekly_Progress_Report_Form-3_*.pdf weekly_reports/
+          mv *_Weekly_Progress_Report_Form-3_*.pdf weekly_reports/ 2>/dev/null || true
 
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
