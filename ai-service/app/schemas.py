@@ -56,6 +56,28 @@ class RoadmapStepSchema(BaseModel):
     recommendedResource: str
 
 
+class FeatureContributionItem(BaseModel):
+    feature: str = Field(..., description="Engineered feature token name", examples=["skill_python"])
+    label: str = Field(..., description="Human-readable feature name", examples=["Python Programming Skill"])
+    value: float = Field(..., description="Student feature value [0.0 - 1.0]", examples=[1.0])
+    shap_value: float = Field(..., description="SHAP attribution impact value", examples=[0.1829])
+    direction: str = Field(..., description="Impact direction ('supports' or 'reduces')", examples=["supports"])
+
+
+class ItemExplanationSchema(BaseModel):
+    summary: str = Field(
+        ...,
+        description="Plain-language explanation summary built from top SHAP features",
+        examples=[
+            "Recommended mainly because of strong Python Programming Skill and Machine Learning & Mathematics Coursework."
+        ],
+    )
+    top_features: List[FeatureContributionItem] = Field(
+        ...,
+        description="Top contributing features sorted by absolute SHAP value impact",
+    )
+
+
 class RecommendationItemResponse(BaseModel):
     id: str
     stack_code: str
@@ -69,6 +91,10 @@ class RecommendationItemResponse(BaseModel):
     whyRecommendedSnippet: str
     rank: int
     roadmap: Optional[List[RoadmapStepSchema]] = None
+    explanation: Optional[ItemExplanationSchema] = Field(
+        None,
+        description="SHAP explainability insights (populated when explain=true)",
+    )
 
 
 class RecommendationResponse(BaseModel):
@@ -78,6 +104,10 @@ class RecommendationResponse(BaseModel):
     primary_recommendation: Optional[RecommendationItemResponse]
     alternative_recommendations: List[RecommendationItemResponse]
     all_ranked_stacks: List[RecommendationItemResponse]
+    recommendations: Optional[List[RecommendationItemResponse]] = Field(
+        None,
+        description="Alias for all_ranked_stacks containing full recommendations with optional explanations",
+    )
     active_student_features: List[Dict[str, Any]]
 
 
