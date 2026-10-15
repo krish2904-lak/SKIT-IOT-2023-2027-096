@@ -169,8 +169,10 @@ python -m venv .venv
 # Linux/macOS:
 source .venv/bin/activate
 
-# Install dependencies
-pip install -r requirements.txt
+# Install dependencies (runtime + testing)
+pip install -r requirements-dev.txt
+# Or for production runtime only:
+# pip install -r requirements.txt
 ```
 
 ### 2. Generate Dataset & Train Model
