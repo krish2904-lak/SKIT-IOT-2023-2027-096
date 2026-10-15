@@ -146,6 +146,11 @@ The inference engine is exposed via RESTful endpoints in `ai-service/app/main.py
 - `POST /api/v1/recommend`: Accepts student profile, returns top-K ranked recommendations, match scores, why-recommended snippets, and 3-phase learning roadmaps.
 - `POST /api/v1/explain`: Accepts student profile and optional stack code, returning transparent feature attributions (SHAP weights), positive drivers, bridgeable gaps with remedies, and learning prerequisites.
 
+```bash
+# Start FastAPI AI Service (from repository root)
+uvicorn --app-dir ai-service app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
 ---
 
 ## 10. Structured 3-Phase Learning Roadmaps

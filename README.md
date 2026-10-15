@@ -134,7 +134,7 @@ personalized technology-stack recommendation.
 |---|---|---|---|
 | **Sprint 1** | Requirement Analysis & Architecture | 10/08/26 – 22/08/26 | ✅ **Completed**: System Architecture (`docs/system-architecture.md`), SRS Specification (`docs/srs-requirements.md`), ERP & Microservice Contracts. |
 | **Sprint 2** | Data Collection & Preparation | 23/08/26 – 30/09/26 | ✅ **Completed**: 48-feature extraction pipeline (`model/preprocessing/`), 1,000-record dataset (`model/data/student_tech_stack_dataset.csv`), Data Dictionary (`docs/dataset-and-features.md`), Isolated Test Fixtures (`model/data/sample_student_profiles.json`). |
-| **Sprint 3** | Tech Stack Prediction Model | 01/10/26 – 31/10/26 | ✅ **Completed (Current)**: Random Forest recommendation model (`model/training/train.py`), Top-K ranking engine (`model/recommendation/predictor.py`), FastAPI service (`ai-service/app/main.py`), 16 automated tests (`tests/`), Technical Docs (`docs/model-documentation.md`). |
+| **Sprint 3** | Tech Stack Prediction Model | 01/10/26 – 31/10/26 | ✅ **Completed (Current)**: Random Forest recommendation model (`model/training/train.py`), Top-K ranking engine (`model/recommendation/predictor.py`), FastAPI service (`ai-service/app/main.py`), 28 automated tests (`tests/`), Technical Docs (`docs/model-documentation.md`). |
 | **Sprint 4** | Resume Parsing & Explainability | 01/11/26 – 02/01/27 | ⏳ *Planned Future Work*: SHAP explainability, LLM resume extraction. |
 | **Sprint 5** | Backend API System Integration | 03/01/27 – 20/02/27 | ⏳ *Planned Future Work*: Node.js gateway integration with FastAPI. |
 | **Sprint 6** | System Testing & Deployment | 21/02/27 – 15/03/27 | ⏳ *Planned Future Work*: End-to-end integration testing and deployment. |
@@ -159,8 +159,8 @@ The model maps student inputs across 48 normalized features to **7 core target t
 ### 1. Environment Setup
 ```bash
 # Clone the repository
-git clone https://github.com/krish2904-lak/F-096.git
-cd F-096
+git clone https://github.com/krish2904-lak/SKIT-IOT-2023-2027-096.git
+cd SKIT-IOT-2023-2027-096
 
 # Create and activate virtual environment (Python 3.10+)
 python -m venv .venv
@@ -192,9 +192,10 @@ pytest -v
 
 ### 4. Run AI Recommendation Microservice
 ```bash
-# Start FastAPI service
-uvicorn ai-service.app.main:app --host 0.0.0.0 --port 8000 --reload
+# Start FastAPI service (run from repository root)
+uvicorn --app-dir ai-service app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 - Interactive Swagger API Docs: `http://localhost:8000/docs`
 - Health Check: `http://localhost:8000/health`
 - Recommendation Endpoint: `POST http://localhost:8000/api/v1/recommend`
+- Explanation Endpoint: `POST http://localhost:8000/api/v1/explain`

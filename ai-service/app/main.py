@@ -4,9 +4,16 @@ Provides RESTful endpoints for health checks, model status, technology stack met
 and student tech-stack recommendation inference.
 """
 
+import sys
+from pathlib import Path
 from typing import Dict, Any, List
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+
+# Ensure repository root is on sys.path so 'model' package is always resolvable
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from .schemas import (
     StudentProfileRequest,
