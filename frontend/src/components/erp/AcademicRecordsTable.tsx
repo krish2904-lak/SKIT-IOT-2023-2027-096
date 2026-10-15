@@ -23,12 +23,19 @@ export const AcademicRecordsTable: React.FC<AcademicRecordsTableProps> = ({
   isSyncing,
 }) => {
   const [selectedSemester, setSelectedSemester] = useState<number>(semester - 1);
+  const [courseSearch, setCourseSearch] = useState<string>('');
+  const [selectedGradeFilter, setSelectedGradeFilter] = useState<string>('ALL');
 
-  // Filter courses by semester or all
-  const filteredCourses =
-    selectedSemester === 0
-      ? courses
-      : courses.filter((c) => c.semester === selectedSemester);
+  // Filter courses by semester, search query, and grade
+  const filteredCourses = courses.filter((c) => {
+    const matchesSemester = selectedSemester === 0 || c.semester === selectedSemester;
+    const matchesSearch =
+      c.name.toLowerCase().includes(courseSearch.toLowerCase()) ||
+      c.code.toLowerCase().includes(courseSearch.toLowerCase());
+    const matchesGrade =
+      selectedGradeFilter === 'ALL' || c.grade === selectedGradeFilter;
+    return matchesSemester && matchesSearch && matchesGrade;
+  });
 
   const getGradeBadge = (grade: string) => {
     switch (grade) {
@@ -190,49 +197,93 @@ export const AcademicRecordsTable: React.FC<AcademicRecordsTableProps> = ({
 
       {/* Semester Coursework Table */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="p-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="p-5 border-b border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <h4 className="text-sm font-bold text-slate-900">Coursework & Laboratory Performance</h4>
-            <p className="text-xs text-slate-500">
-              Direct inputs supplied to the Random Forest recommendation model.
+            <div className="flex items-center gap-2">
+              <h4 className="text-sm font-bold text-slate-900">Coursework & Laboratory Performance</h4>
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                {filteredCourses.length} of {courses.length} courses
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Verified institutional metrics supplied to the Random Forest recommendation engine.
             </p>
           </div>
 
-          {/* Semester Selector Buttons */}
-          <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg">
-            <button
-              type="button"
-              onClick={() => setSelectedSemester(0)}
-              className={`px-2.5 py-1 text-xs font-medium rounded-md transition cursor-pointer ${
-                selectedSemester === 0
-                  ? 'bg-white text-slate-900 shadow-xs font-semibold'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              All Courses
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedSemester(5)}
-              className={`px-2.5 py-1 text-xs font-medium rounded-md transition cursor-pointer ${
-                selectedSemester === 5
-                  ? 'bg-white text-slate-900 shadow-xs font-semibold'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Semester 5
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedSemester(4)}
-              className={`px-2.5 py-1 text-xs font-medium rounded-md transition cursor-pointer ${
-                selectedSemester === 4
-                  ? 'bg-white text-slate-900 shadow-xs font-semibold'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Semester 4
-            </button>
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Live Search input */}
+            <div className="relative">
+              <input
+                type="text"
+                value={courseSearch}
+                onChange={(e) => setCourseSearch(e.target.value)}
+                placeholder="Search subject or code..."
+                className="pl-7 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 w-44 sm:w-48 transition"
+              />
+              <svg
+                className="w-3.5 h-3.5 text-slate-400 absolute left-2 top-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+
+            {/* Grade Filter */}
+            <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-xs">
+              {(['ALL', 'A+', 'A', 'B+'] as const).map((grade) => (
+                <button
+                  key={grade}
+                  type="button"
+                  onClick={() => setSelectedGradeFilter(grade)}
+                  className={`px-2 py-1 rounded-md font-medium text-[11px] transition cursor-pointer ${
+                    selectedGradeFilter === grade
+                      ? 'bg-white text-slate-900 shadow-2xs font-semibold'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {grade}
+                </button>
+              ))}
+            </div>
+
+            {/* Semester Selector Buttons */}
+            <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-xs">
+              <button
+                type="button"
+                onClick={() => setSelectedSemester(0)}
+                className={`px-2.5 py-1 text-xs font-medium rounded-md transition cursor-pointer ${
+                  selectedSemester === 0
+                    ? 'bg-white text-slate-900 shadow-2xs font-semibold'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                All
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedSemester(5)}
+                className={`px-2.5 py-1 text-xs font-medium rounded-md transition cursor-pointer ${
+                  selectedSemester === 5
+                    ? 'bg-white text-slate-900 shadow-2xs font-semibold'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Sem 5
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedSemester(4)}
+                className={`px-2.5 py-1 text-xs font-medium rounded-md transition cursor-pointer ${
+                  selectedSemester === 4
+                    ? 'bg-white text-slate-900 shadow-2xs font-semibold'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Sem 4
+              </button>
+            </div>
           </div>
         </div>
 

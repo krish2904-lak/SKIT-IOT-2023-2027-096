@@ -236,10 +236,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   key={item.id}
                   type="button"
                   onClick={() => handleItemClick(item.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left transition cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left transition-all duration-150 cursor-pointer ${
                     isActive
-                      ? 'bg-blue-600/20 text-blue-400 font-semibold border border-blue-500/30'
-                      : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                      ? 'bg-gradient-to-r from-blue-600/25 to-blue-500/10 text-blue-300 font-semibold border-l-3 border-l-blue-400 pl-2.5 shadow-2xs'
+                      : 'text-slate-300 hover:bg-slate-800/80 hover:text-white pl-3'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -251,8 +251,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </div>
                   {item.badge && (
                     <span
-                      className={`text-[9px] px-1.5 py-0.5 rounded font-mono ${
-                        isActive ? 'bg-blue-500/30 text-blue-300' : 'bg-slate-800 text-slate-400'
+                      className={`text-[9px] px-1.5 py-0.5 rounded font-mono font-medium ${
+                        isActive
+                          ? 'bg-blue-500/30 text-blue-300 border border-blue-400/30'
+                          : 'bg-slate-800 text-slate-400 border border-slate-700/60'
                       }`}
                     >
                       {item.badge}
