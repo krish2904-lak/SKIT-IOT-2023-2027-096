@@ -109,33 +109,34 @@ SHAP (**SHapley Additive exPlanations**) originates from cooperative game theory
 
 ```json
 {
-  "student_id": "STU_2026_AI_001",
-  "name": "Nishant Kumawat",
+  "student_id": "SKIT/2023/CSE-AIML/015",
+  "branch": "CSE (AI/ML)",
   "semester": 6,
-  "academic": {
-    "cgpa": 8.85,
-    "course_web_technologies": 78.0,
-    "course_dbms": 84.0,
-    "course_dsa": 88.0,
-    "course_iot_embedded": 72.0,
-    "course_ml_math": 92.0,
-    "course_cloud_computing": 80.0,
-    "course_operating_systems": 85.0
+  "cgpa": 8.85,
+  "academic_scores": {
+    "web_technologies": 78.0,
+    "dbms": 84.0,
+    "dsa": 88.0,
+    "iot_embedded": 72.0,
+    "ml_math": 92.0,
+    "cloud_computing": 80.0,
+    "operating_systems": 85.0
   },
   "interests": [
     "ai_ml",
     "data_analytics"
   ],
   "skills": [
-    { "name": "Python", "level": "advanced" },
-    { "name": "PyTorch", "level": "intermediate" },
-    { "name": "FastAPI", "level": "intermediate" },
-    { "name": "SQL", "level": "intermediate" },
-    { "name": "Pandas", "level": "advanced" },
-    { "name": "Docker", "level": "beginner" }
+    { "name": "python", "level": "advanced" },
+    { "name": "pytorch", "level": "intermediate" },
+    { "name": "fastapi", "level": "intermediate" },
+    { "name": "sql", "level": "intermediate" },
+    { "name": "pandas", "level": "advanced" },
+    { "name": "docker", "level": "beginner" }
   ],
-  "project_experience_count": 3,
-  "certifications_count": 2
+  "projects_completed": 3,
+  "certifications_count": 2,
+  "top_k": 3
 }
 ```
 
