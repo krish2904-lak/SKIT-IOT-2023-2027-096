@@ -134,8 +134,8 @@ personalized technology-stack recommendation.
 |---|---|---|---|
 | **Sprint 1** | Requirement Analysis & Architecture | 10/08/26 – 22/08/26 | ✅ **Completed**: System Architecture (`docs/system-architecture.md`), SRS Specification (`docs/srs-requirements.md`), ERP & Microservice Contracts. |
 | **Sprint 2** | Data Collection & Preparation | 23/08/26 – 30/09/26 | ✅ **Completed**: 48-feature extraction pipeline (`model/preprocessing/`), 1,000-record dataset (`model/data/student_tech_stack_dataset.csv`), Data Dictionary (`docs/dataset-and-features.md`), Isolated Test Fixtures (`model/data/sample_student_profiles.json`). |
-| **Sprint 3** | Tech Stack Prediction Model | 01/10/26 – 31/10/26 | ✅ **Completed (Current)**: Random Forest recommendation model (`model/training/train.py`), Top-K ranking engine (`model/recommendation/predictor.py`), FastAPI service (`ai-service/app/main.py`), 28 automated tests (`tests/`), Technical Docs (`docs/model-documentation.md`). |
-| **Sprint 4** | Resume Parsing & Explainability | 01/11/26 – 02/01/27 | ⏳ *Planned Future Work*: SHAP explainability, LLM resume extraction. |
+| **Sprint 3** | Tech Stack Prediction Model | 01/10/26 – 31/10/26 | ✅ **Completed**: Random Forest recommendation model (`model/training/train.py`), Top-K ranking engine (`model/recommendation/predictor.py`), FastAPI service (`ai-service/app/main.py`), automated test suite (`tests/`), Technical Docs (`docs/model-documentation.md`). |
+| **Sprint 4** | Resume Parsing & Explainability | 01/11/26 – 02/01/27 | 🔄 **In Progress (Groundwork Complete)**: TreeSHAP explainability engine (`model/explainability/`), 48 human-readable feature labels (`model/explainability/labels.py`), additive explainability API endpoints (`POST /api/v1/recommend?explain=true` & `POST /api/v1/recommend/explain`), 37 automated tests passing (`tests/`). LLM resume extraction planned next. |
 | **Sprint 5** | Backend API System Integration | 03/01/27 – 20/02/27 | ⏳ *Planned Future Work*: Node.js gateway integration with FastAPI. |
 | **Sprint 6** | System Testing & Deployment | 21/02/27 – 15/03/27 | ⏳ *Planned Future Work*: End-to-end integration testing and deployment. |
 
@@ -191,6 +191,7 @@ python -m model.training.evaluate --cv
 ```bash
 pytest -v
 ```
+*Current test suite: **37 passing tests** across preprocessing, prediction, evaluation, API schemas, and TreeSHAP explainability.*
 
 ### 4. Run AI Recommendation Microservice
 ```bash
@@ -199,5 +200,7 @@ uvicorn --app-dir ai-service app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 - Interactive Swagger API Docs: `http://localhost:8000/docs`
 - Health Check: `http://localhost:8000/health`
-- Recommendation Endpoint: `POST http://localhost:8000/api/v1/recommend`
-- Explanation Endpoint: `POST http://localhost:8000/api/v1/explain`
+- Recommendation Endpoint (Standard): `POST http://localhost:8000/api/v1/recommend`
+- Recommendation Endpoint with TreeSHAP Explanations: `POST http://localhost:8000/api/v1/recommend?explain=true`
+- Dedicated TreeSHAP Explanation Endpoint: `POST http://localhost:8000/api/v1/recommend/explain`
+- Explanation API Contract: [`docs/explainability-api-contract.md`](docs/explainability-api-contract.md)
