@@ -34,10 +34,11 @@
 - **Status:** COMPLETED (UP TO CURRENT DATE)
 - **Activities & Deliverables:**
   - Implemented Scikit-learn Random Forest recommendation model (`model/training/train.py`).
-  - Defined 7 target technology stack categories with rich component technology breakdowns (`model/recommendation/tech_stacks.py`).
+  - Defined 7 target technology stack categories with rich component technology breakdowns and 3-phase structured learning roadmaps (`model/recommendation/tech_stacks.py`).
   - Trained model on the prepared dataset, achieving 100% holdout test accuracy and 100% 5-fold cross-validation accuracy.
-  - Saved model artifacts (`rf_tech_stack_model.joblib`, `preprocessor.joblib`, `model_metadata.json`) to `model/saved_models/`.
-  - Built production-ready `TechStackPredictor` class (`model/recommendation/predictor.py`) supporting Top-K ranking, match score calculations, and reasoning snippets.
-  - Exposed REST endpoints in FastAPI service (`ai-service/app/main.py`) for `/health`, `/api/v1/model-info`, `/api/v1/tech-stacks`, and `/api/v1/recommend`.
-  - Verified implementation with comprehensive test suite (`pytest`) covering preprocessing, inference, and API endpoints (16 passed tests).
+  - Implemented comprehensive model evaluation and benchmarking diagnostics (`model/training/evaluate.py`) supporting Stratified K-Fold CV, hyperparameter comparison leaderboard across 5 model configurations, confusion matrix formatting, and serialized evaluation metrics (`model/saved_models/evaluation_metrics.json`).
+  - Built production-ready `TechStackPredictor` class (`model/recommendation/predictor.py`) supporting Top-K ranking, match score calculations, learning roadmaps, and reasoning snippets.
+  - Built explainability engine `TechStackExplainer` (`model/recommendation/explainability.py`) computing transparent SHAP factor impacts, positive academic/skill drivers, bridgeable gaps with remedies, and prerequisite guidance.
+  - Exposed REST endpoints in FastAPI service (`ai-service/app/main.py`) for `/health`, `/api/v1/model-info`, `/api/v1/tech-stacks`, `/api/v1/recommend`, and `/api/v1/explain`.
+  - Verified implementation with comprehensive test suite (`pytest`) covering preprocessing, inference, evaluation, explainability, and API endpoints (28 passed tests across 5 test suites).
   - Authored full technical documentation (`docs/model-documentation.md`).

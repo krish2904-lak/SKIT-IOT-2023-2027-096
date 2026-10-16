@@ -48,6 +48,14 @@ class TechItem(BaseModel):
     description: Optional[str] = None
 
 
+class RoadmapStepSchema(BaseModel):
+    phase: str
+    duration: str
+    title: str
+    topics: List[str]
+    recommendedResource: str
+
+
 class RecommendationItemResponse(BaseModel):
     id: str
     stack_code: str
@@ -60,6 +68,7 @@ class RecommendationItemResponse(BaseModel):
     technologies: List[TechItem]
     whyRecommendedSnippet: str
     rank: int
+    roadmap: Optional[List[RoadmapStepSchema]] = None
 
 
 class RecommendationResponse(BaseModel):
@@ -70,3 +79,30 @@ class RecommendationResponse(BaseModel):
     alternative_recommendations: List[RecommendationItemResponse]
     all_ranked_stacks: List[RecommendationItemResponse]
     active_student_features: List[Dict[str, Any]]
+
+
+class FeatureImpactSchema(BaseModel):
+    featureName: str
+    displayName: str
+    shapValue: float
+    impactDirection: str
+    category: str
+    explanationNote: str
+    remedyElective: Optional[str] = None
+    potentialBoost: Optional[float] = None
+
+
+class StackExplanationResponse(BaseModel):
+    recommendationId: str
+    recommendationTitle: str
+    baseConfidence: float
+    summaryText: str
+    topPositiveFactors: List[FeatureImpactSchema]
+    topNegativeFactors: List[FeatureImpactSchema]
+    learningPrerequisites: List[str]
+
+
+class ExplanationRequest(BaseModel):
+    profile: StudentProfileRequest
+    stack_code: Optional[str] = Field(None, description="Optional stack code to explain; defaults to top recommended")
+

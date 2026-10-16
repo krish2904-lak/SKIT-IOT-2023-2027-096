@@ -158,6 +158,7 @@ class TechStackPredictor:
                 "technologies": meta["technologies"],
                 "whyRecommendedSnippet": reason,
                 "rank": rank,
+                "roadmap": meta.get("roadmap", []),
             }
             recommendations.append(rec_item)
 

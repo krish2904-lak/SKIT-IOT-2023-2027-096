@@ -55,16 +55,22 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           onSyncErp={onSyncErp}
           onToggleMobileNav={() => setIsMobileNavOpen((prev) => !prev)}
           onOpenReportModal={() => setIsReportModalOpen(true)}
+          onTabChange={onTabChange}
         />
 
-        {/* Sync alert banner */}
+        {/* Sync alert banner & floating toast */}
         {syncNotification && (
-          <div className="bg-emerald-50 border-b border-emerald-200 px-6 py-2.5 flex items-center justify-between text-xs text-emerald-800 transition-all">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span>{syncNotification}</span>
+          <div className="fixed top-18 right-6 z-50 max-w-md bg-white border border-emerald-300 rounded-xl shadow-xl p-3.5 flex items-start gap-3 animate-fade-in">
+            <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
             </div>
-            <span className="font-mono text-[10px] text-emerald-600">Verified institutional data</span>
+            <div className="flex-1 text-xs">
+              <span className="font-bold text-slate-900 block">Institutional ERP Update</span>
+              <p className="text-slate-600 mt-0.5 leading-relaxed">{syncNotification}</p>
+              <span className="font-mono text-[10px] text-emerald-600 mt-1 inline-block">SKIT College API • Verified</span>
+            </div>
           </div>
         )}
 

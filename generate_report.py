@@ -288,14 +288,20 @@ def generate_pdf(interval="weekly"):
 
     if interval == "weekly":
         report_title = "Weekly Progress Report (Form-3)"
-        doc_name = (
-            f"{repo_name}_Weekly_Progress_Report_Form-3_{date_stamp}.pdf"
+        output_dir = "weekly_reports"
+        os.makedirs(output_dir, exist_ok=True)
+        doc_name = os.path.join(
+            output_dir,
+            f"{repo_name}_Weekly_Progress_Report_Form-3_{date_stamp}.pdf",
         )
 
     elif interval == "monthly":
         report_title = "Monthly Progress Report (Form-3)"
-        doc_name = (
-            f"{repo_name}_Monthly_Progress_Report_Form-3_{date_stamp}.pdf"
+        output_dir = "weekly_reports"
+        os.makedirs(output_dir, exist_ok=True)
+        doc_name = os.path.join(
+            output_dir,
+            f"{repo_name}_Monthly_Progress_Report_Form-3_{date_stamp}.pdf",
         )
 
     else:

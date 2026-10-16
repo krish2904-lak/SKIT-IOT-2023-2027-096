@@ -215,6 +215,121 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
           </div>
         </div>
       </div>
+
+      {/* NEW SECTION: Career Pathway Competency Radar & Academic Milestones */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Domain Competency Distribution */}
+        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div>
+              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">
+                Skills Ingestion & Matching
+              </span>
+              <h4 className="text-sm font-bold text-slate-900 mt-0.5">
+                Domain Competency Alignment
+              </h4>
+            </div>
+            <span className="text-xs font-mono font-medium text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+              88% Average Fit
+            </span>
+          </div>
+
+          <div className="space-y-3.5 pt-1">
+            <div>
+              <div className="flex justify-between text-xs mb-1">
+                <span className="font-medium text-slate-800">Full-Stack Web & Cloud Systems</span>
+                <span className="font-mono font-bold text-blue-600">94%</span>
+              </div>
+              <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                <div className="bg-blue-600 h-2 rounded-full transition-all duration-700 w-[94%]" />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between text-xs mb-1">
+                <span className="font-medium text-slate-800">Cloud Architecture & DevOps Containerization</span>
+                <span className="font-mono font-bold text-indigo-600">89%</span>
+              </div>
+              <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                <div className="bg-indigo-600 h-2 rounded-full transition-all duration-700 w-[89%]" />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between text-xs mb-1">
+                <span className="font-medium text-slate-800">IoT & Microcontroller Systems (SKIT Specialization)</span>
+                <span className="font-mono font-bold text-cyan-600">82%</span>
+              </div>
+              <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                <div className="bg-cyan-600 h-2 rounded-full transition-all duration-700 w-[82%]" />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between text-xs mb-1">
+                <span className="font-medium text-slate-800">Applied Artificial Intelligence & Data Pipelines</span>
+                <span className="font-mono font-bold text-rose-600">76%</span>
+              </div>
+              <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                <div className="bg-rose-500 h-2 rounded-full transition-all duration-700 w-[76%]" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Real-time System & Verification Timeline */}
+        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div>
+              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">
+                Audit Trail
+              </span>
+              <h4 className="text-sm font-bold text-slate-900 mt-0.5">
+                Institutional Milestones & Execution
+              </h4>
+            </div>
+            <span className="text-[11px] text-slate-500 font-mono">v2.4 Live</span>
+          </div>
+
+          <div className="space-y-3 pt-1">
+            <div className="flex items-start gap-3">
+              <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold">
+                ✓
+              </div>
+              <div>
+                <div className="text-xs font-bold text-slate-900">SKIT ERP Academic Records Synchronized</div>
+                <div className="text-[11px] text-slate-500">
+                  Semesters 1 to 5 coursework, lab marks, and 8.42 CGPA ingested.
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold">
+                ✓
+              </div>
+              <div>
+                <div className="text-xs font-bold text-slate-900">Random Forest Classifier Inference Done</div>
+                <div className="text-[11px] text-slate-500">
+                  Ranked 4 high-demand career pathways with TreeSHAP factor calculation.
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold">
+                ✓
+              </div>
+              <div>
+                <div className="text-xs font-bold text-slate-900">Milestone Roadmap Generated</div>
+                <div className="text-[11px] text-slate-500">
+                  Step-by-step curriculum with recommended resource links mapped.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
