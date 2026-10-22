@@ -105,6 +105,17 @@ export const mockStudentProfile: StudentProfile = {
   lastErpSync: '2026-10-08 11:30 IST',
   erpCourses: mockErpCourses,
   sgpaHistory: mockSgpaHistory,
+  projectsCompleted: 3,
+  certificationsCount: 2,
+  academicScores: {
+    web_technologies: 95.0,
+    dbms: 84.0,
+    dsa: 82.0,
+    iot_embedded: 92.0,
+    ml_math: 78.0,
+    cloud_computing: 80.0,
+    operating_systems: 88.0,
+  },
 };
 
 export const emptyStudentProfile: Partial<StudentProfile> = {
