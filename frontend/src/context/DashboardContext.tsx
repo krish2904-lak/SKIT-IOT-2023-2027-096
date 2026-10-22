@@ -101,6 +101,9 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             skills: data.skills,
             resumeUploaded: data.resumeUploaded,
             resumeFileName: data.resumeFileName,
+            projectsCompleted: data.projectsCompleted ?? student.projectsCompleted,
+            certificationsCount: data.certificationsCount ?? student.certificationsCount,
+            academicScores: data.academicScores ?? student.academicScores,
           });
         }
         setIsLoadingRecs(true);
