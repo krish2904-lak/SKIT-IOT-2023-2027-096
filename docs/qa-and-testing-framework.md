@@ -3,8 +3,8 @@
 **Author & QA Lead:** Saloni Jain (Data & Testing)  
 **Project ID:** SKIT/DS/2023-2027/CSE-F-096  
 **Mentor:** Dr. Archika Jain  
-**Current Date:** October 14, 2026  
-**Version:** 1.1.0 — Sprint 3 Week 6 Validation Pass  
+**Current Date:** October 22, 2026  
+**Version:** 1.2.0 — Sprint 3 Week 7 Validation Pass  
 
 ---
 
@@ -15,6 +15,8 @@ This document specifies the Quality Assurance (QA) and testing framework develop
 2. **Preprocessing Robustness**: Unit tests for normalization, missing field defaults, and canonical skill mappings.
 3. **Model Inference QA**: Monotonicity of Top-K recommendations, score boundary validation, and sub-50ms latency benchmarks.
 4. **API Integration Contracts & Edge Cases**: Payload contracts, boundary score behavior, cold-start fallback resilience, and error mapping compliance.
+5. **Explainability & SHAP Attributions**: Schema compliance for feature impacts, positive/negative factor bounds, and prerequisite guidance.
+6. **Structured Learning Roadmaps**: Invariant schema auditing across 3-phase structured roadmaps for all 7 tech stack categories.
 
 ---
 
@@ -30,8 +32,10 @@ This document specifies the Quality Assurance (QA) and testing framework develop
 │ test_preprocessing_qa.py │ Normalization & QA  │ 5 / 5        │
 │ test_model_inference_qa.py│ Prediction & Latency│ 5 / 5        │
 │ test_api_integration_qa.py│ Contracts & Boundaries│ 5 / 5      │
+│ test_explainability_qa.py │ SHAP & Feature XAI  │ 5 / 5        │
+│ test_roadmap_qa.py       │ 3-Phase Roadmaps    │ 3 / 3        │
 ├──────────────────────────┼─────────────────────┼──────────────┤
-│ TOTAL                    │ Full Pipeline QA    │ 19 / 19      │
+│ TOTAL                    │ Full Pipeline QA    │ 27 / 27      │
 └──────────────────────────┴─────────────────────┴──────────────┘
 ```
 
@@ -62,6 +66,17 @@ This document specifies the Quality Assurance (QA) and testing framework develop
 - **Boundary Conditions:** Verifies extreme academic boundaries (0.0 SGPA, 10.0 CGPA, 100% attendance).
 - **Cold-Start Fallbacks:** Verifies sparse/empty skill profiles return safe baseline recommendations.
 - **Validation Mapping:** Asserts 422 Unprocessable Entity payload structure when mandatory fields are omitted.
+
+### 3.5 Explainability & SHAP QA (`tests/test_explainability_qa.py`)
+- **Payload Schema:** Verifies required keys (`recommendationId`, `baseConfidence`, `summaryText`, `topPositiveFactors`, `topNegativeFactors`, `learningPrerequisites`).
+- **Impact Direction & Bounds:** Validates mathematical sign invariants (positive factor SHAP $> 0$, negative factor SHAP $< 0$, potential boost $\in [0.0, 15.0]$).
+- **Prerequisite Coverage:** Validates all 7 catalog stacks supply actionable prerequisites.
+- **Cold-Start Resilience:** Confirms zero-data student profiles produce valid explainability payloads without runtime exceptions.
+
+### 3.6 3-Phase Structured Roadmap QA (`tests/test_roadmap_qa.py`)
+- **Catalog Invariants:** Asserts every technology stack defines exactly 3 sequential phases.
+- **Phase Schema:** Validates mandatory non-empty fields (`phase`, `duration`, `title`, `topics`, `recommendedResource`).
+- **Topic Granularity:** Guarantees each phase contains $\ge 2$ structured curriculum topics.
 
 ---
 
