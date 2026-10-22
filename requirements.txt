@@ -6,3 +6,7 @@ pandas==3.0.6
 numpy==2.5.3
 joblib==1.6.0
 shap==0.53.0
+pypdf==6.20.1
+python-docx==1.2.0
+python-multipart==0.0.32
+httpx==0.28.1
