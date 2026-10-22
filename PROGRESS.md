@@ -66,7 +66,7 @@ python -m model.training.evaluate --save-metrics model/saved_models/evaluation_m
 
 ### Launch the AI Microservice
 ```bash
-uvicorn app.main:app --app-dir ai-service --reload --port 8000
+uvicorn --app-dir ai-service app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 Interactive Swagger docs: `http://localhost:8000/docs`
 

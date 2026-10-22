@@ -85,6 +85,9 @@ class MockExplainabilityQAEngine:
 class TestExplainabilityQA:
     """QA test suite evaluating explainability payload contracts, feature attribution invariants and edge cases."""
 
+    def setup_method(self):
+        self.setUp()
+
     def setUp(self):
         self.standard_student = {
             "academic_scores": {
