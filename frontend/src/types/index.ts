@@ -47,6 +47,19 @@ export interface StudentProfile {
   lastErpSync: string;
   erpCourses?: ErpCourseRecord[];
   sgpaHistory?: SemesterSgpaRecord[];
+  projectsCompleted?: number;
+  certificationsCount?: number;
+  academicScores?: AcademicScoresData;
+}
+
+export interface AcademicScoresData {
+  web_technologies?: number;
+  dbms?: number;
+  dsa?: number;
+  iot_embedded?: number;
+  ml_math?: number;
+  cloud_computing?: number;
+  operating_systems?: number;
 }
 
 export type TechCategory = 'Frontend' | 'Backend' | 'Database' | 'DevOps' | 'AI_ML' | 'IoT';
@@ -119,6 +132,9 @@ export interface StudentInputFormData {
   learningPace: 'Self-Paced' | 'Intensive' | 'Balanced';
   resumeUploaded: boolean;
   resumeFileName?: string;
+  projectsCompleted?: number;
+  certificationsCount?: number;
+  academicScores?: AcademicScoresData;
 }
 
 export type DashboardTab =
@@ -129,3 +145,4 @@ export type DashboardTab =
   | 'explanation'
   | 'history'
   | 'compare';
+
