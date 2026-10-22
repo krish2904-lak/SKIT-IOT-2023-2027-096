@@ -40,6 +40,9 @@ class StudentProfileRequest(BaseModel):
     projects_completed: Optional[int] = Field(1, ge=0, le=20)
     certifications_count: Optional[int] = Field(0, ge=0, le=10)
     top_k: Optional[int] = Field(3, ge=1, le=7, description="Number of top recommendations to return")
+    resume_uploaded: Optional[bool] = Field(False, description="Flag indicating if resume was parsed")
+    resume_data: Optional[Dict[str, Any]] = Field(None, description="Optional raw resume extraction data")
+    resume_features: Optional[Dict[str, float]] = Field(None, description="Optional resume-derived feature weights")
 
 
 class TechItem(BaseModel):
@@ -112,27 +115,45 @@ class RecommendationResponse(BaseModel):
 
 
 class FeatureImpactSchema(BaseModel):
-    featureName: str
-    displayName: str
-    shapValue: float
-    impactDirection: str
-    category: str
-    explanationNote: str
-    remedyElective: Optional[str] = None
-    potentialBoost: Optional[float] = None
+    feature: Optional[str] = Field(None, description="Feature token name, e.g. 'course_web_technologies'")
+    featureName: str = Field(..., description="Frontend compatible feature token name")
+    label: Optional[str] = Field(None, description="Human-readable label")
+    displayName: str = Field(..., description="Frontend display name")
+    value: Optional[float] = Field(None, description="Student feature value [0.0 - 1.0]")
+    shapValue: float = Field(..., description="SHAP attribution impact weight")
+    shap_value: Optional[float] = Field(None, description="Snake_case SHAP attribution alias")
+    impactDirection: str = Field(..., description="Impact direction: POSITIVE or NEGATIVE")
+    category: str = Field(..., description="Feature category: ERP_ACADEMICS, STUDENT_INTEREST, EXISTING_SKILL, PORTFOLIO_EXPERIENCE")
+    explanationNote: str = Field(..., description="Contextual explanation sentence")
+    remedyElective: Optional[str] = Field(None, description="Recommended elective or workshop to bridge skill gap")
+    potentialBoost: Optional[float] = Field(None, description="Expected match score percentage boost upon bridging gap")
 
 
 class StackExplanationResponse(BaseModel):
-    recommendationId: str
-    recommendationTitle: str
-    baseConfidence: float
-    summaryText: str
-    topPositiveFactors: List[FeatureImpactSchema]
-    topNegativeFactors: List[FeatureImpactSchema]
-    learningPrerequisites: List[str]
+    recommendationId: str = Field(..., description="Catalog identifier, e.g. 'rec-mern-001'")
+    recommendationTitle: str = Field(..., description="Human-readable technology stack title")
+    stackCode: Optional[str] = Field(None, description="Target stack code, e.g. 'MERN_FULL_STACK'")
+    baseConfidence: float = Field(..., description="Model prior base probability / baseline confidence")
+    predictedConfidence: Optional[float] = Field(None, description="Model inference probability for the stack")
+    summaryText: str = Field(..., description="1-2 plain-English sentences summarizing key drivers and gaps")
+    topPositiveFactors: List[FeatureImpactSchema] = Field(..., description="Top 5 positive contributing factors (SHAP >= 0)")
+    topNegativeFactors: List[FeatureImpactSchema] = Field(..., description="Top 5 negative contributing factors (SHAP < 0)")
+    learningPrerequisites: List[str] = Field(..., description="Foundational prerequisites for mastering this technology stack")
 
 
 class ExplanationRequest(BaseModel):
-    profile: StudentProfileRequest
+    profile: Optional[StudentProfileRequest] = Field(None, description="Nested student profile object")
+    student_id: Optional[str] = None
+    branch: Optional[str] = None
+    semester: Optional[int] = None
+    cgpa: Optional[float] = None
+    academic_scores: Optional[AcademicScoresInput] = None
+    skills: Optional[List[Union[StudentSkillInput, str]]] = None
+    interests: Optional[List[str]] = None
+    projects_completed: Optional[int] = None
+    certifications_count: Optional[int] = None
     stack_code: Optional[str] = Field(None, description="Optional stack code to explain; defaults to top recommended")
 
+
+# Re-export Resume schemas
+from .resume.schemas import ExtractedSkill, ResumeExtractionResult, ResumeParseResponse
