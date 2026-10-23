@@ -2,14 +2,18 @@ name: Weekly Progress Report Auto-Commit
 
 on:
   schedule:
-    # Runs every Saturday at 5:00 AM IST (Friday 23:30 UTC)
-    # Cron format: min hour day-of-month month day-of-week (5 = Friday)
+    # Every Saturday at 5:00 AM IST (Friday 23:30 UTC)
     - cron: '30 23 * * 5'
 
-  workflow_dispatch: # Allows manual trigger anytime from the Actions tab
+  workflow_dispatch:
 
 permissions:
   contents: write
+
+# Prevent overlapping runs from pushing at the same time.
+concurrency:
+  group: weekly-progress-report
+  cancel-in-progress: false
 
 jobs:
   generate-and-commit:
@@ -21,6 +25,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -29,27 +34,45 @@ jobs:
 
       - name: Install PDF & Graph Dependencies
         run: |
-          pip install reportlab matplotlib
+          python -m pip install --upgrade pip
+          python -m pip install reportlab matplotlib
 
       - name: Generate Weekly PDF Report
         run: |
           python generate_report.py weekly
 
       - name: Move PDF to Weekly Reports Directory & Commit to Repository
+        shell: bash
         run: |
+          set -euo pipefail
+
           mkdir -p weekly_reports
 
-          mv *_Weekly_Progress_Report_Form-3_*.pdf weekly_reports/ 2>/dev/null || true
+          shopt -s nullglob
+          reports=( *_Weekly_Progress_Report_Form-3_*.pdf )
 
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          if [ ${#reports[@]} -eq 0 ]; then
+            echo "Error: No generated weekly PDF report found."
+            exit 1
+          fi
+
+          mv -- "${reports[@]}" weekly_reports/
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add -f weekly_reports/
 
-          if git diff --staged --quiet; then
+          if git diff --cached --quiet; then
             echo "No new changes or reports to commit."
-          else
-            git commit -m "docs: archive Form-3 weekly progress report [skip ci]"
-            git pull --rebase origin main
-            git push origin HEAD:main
+            exit 0
           fi
+
+          git commit -m "docs: archive Form-3 weekly progress report [skip ci]"
+
+          # Incorporate remote changes before pushing.
+          git fetch origin main
+          git rebase origin/main
+
+          # Push only if the rebase completed successfully.
+          git push origin HEAD:main
