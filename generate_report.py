@@ -27,10 +27,37 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 COLLEGE_NAME = "Swami Keshvanand Institute of Technology,Management & Gramothan, Jaipur"
 DEPARTMENT_NAME = "Department of Computer Science & Engineering"
 
+# Canonical team members expected on Form-3
+TEAM_MEMBERS = [
+    "Nishant Kumawat",
+    "Lakshya Jain",
+    "Prachi Bhardwaj",
+    "Saloni Jain",
+]
+
+# Map Git author names, GitHub usernames, and emails to canonical student names
+AUTHOR_MAPPING = {
+    # Nishant Kumawat (Team Lead)
+    "nishant kumawat": "Nishant Kumawat",
+    "nishant1-yy": "Nishant Kumawat",
+    "nishantkumawat878@gmail.com": "Nishant Kumawat",
+    # Lakshya Jain
+    "lakshya jain": "Lakshya Jain",
+    "krish2904-lak": "Lakshya Jain",
+    "krishsiloriya2004@gmail.com": "Lakshya Jain",
+    # Prachi Bhardwaj
+    "prachi bhardwaj": "Prachi Bhardwaj",
+    "prachi_bhardwaj": "Prachi Bhardwaj",
+    "prachipihu09@gmail.com": "Prachi Bhardwaj",
+    # Saloni Jain
+    "saloni jain": "Saloni Jain",
+    "saljain2501@gmail.com": "Saloni Jain",
+}
+
 
 # -------------------------------------------------------------
 def get_repo_info():
-    """Extracts the exact repository name and branch reliably in GitHub Codespaces."""
+    """Extracts the exact repository name and branch reliably in GitHub Codespaces/Actions."""
     repo_name = "Project-Repository"
     branch_name = "main"
 
@@ -61,12 +88,17 @@ def get_repo_info():
     except Exception:
         pass
 
+    if branch_name == "HEAD":
+        github_ref = os.environ.get("GITHUB_REF_NAME") or os.environ.get("GITHUB_REF", "")
+        if github_ref:
+            branch_name = github_ref.replace("refs/heads/", "")
+
     return repo_name, branch_name
 
 
-def get_git_metrics(interval="weekly"):
+def get_git_metrics(interval="weekly", since_override=None):
     """
-    Parses Git commit logs.
+    Parses Git commit logs across all branches.
     Supported intervals: 'weekly', 'monthly', 'final'
     """
     today = datetime.date.today()
@@ -74,13 +106,17 @@ def get_git_metrics(interval="weekly"):
     git_args = [
         "git",
         "log",
-        "--no-merges",
-        "--pretty=format:COMMIT|||%h|||%an|||%ad|||%s",
+        "--all",
+        "--pretty=format:COMMIT|||%h|||%an|||%ae|||%ad|||%s",
         "--date=short",
         "--numstat",
     ]
 
-    if interval == "weekly":
+    if since_override:
+        git_args.append(f"--since={since_override}")
+        scope_title = f"Since {since_override}"
+
+    elif interval == "weekly":
         since_date = (today - datetime.timedelta(days=7)).strftime("%Y-%m-%d")
         git_args.append(f"--since={since_date}")
         scope_title = f"Last 7 Days (Since {since_date})"
@@ -102,7 +138,7 @@ def get_git_metrics(interval="weekly"):
 
     except subprocess.CalledProcessError:
         print("[ERROR] Git command failed. Please ensure you are inside a Git repository.")
-        return None, None, None, scope_title
+        return None, None, None, scope_title, None
 
     students = defaultdict(
         lambda: {
@@ -113,8 +149,14 @@ def get_git_metrics(interval="weekly"):
         }
     )
 
+    # Initialize all team members so they appear consistently in Form-3 table
+    for member in TEAM_MEMBERS:
+        _ = students[member]
+
     timeline_activity = defaultdict(lambda: defaultdict(int))
     student_logs = defaultdict(list)
+    period_order = {}
+    seen_shas = set()
 
     current_author = None
     current_date_str = None
@@ -128,22 +170,39 @@ def get_git_metrics(interval="weekly"):
         if line.startswith("COMMIT|||"):
             parts = line.split("|||")
 
-            if len(parts) >= 5:
+            if len(parts) >= 6:
                 sha = parts[1].strip()
-                author = parts[2].strip()
+                author_name = parts[2].strip()
+                author_email = parts[3].strip()
+                date_str = parts[4].strip()
+                msg = parts[5].strip()
+            elif len(parts) == 5:
+                sha = parts[1].strip()
+                author_name = parts[2].strip()
+                author_email = ""
                 date_str = parts[3].strip()
                 msg = parts[4].strip()
-
             else:
                 continue
 
+            # Deduplicate commits across branches
+            if sha in seen_shas:
+                current_author = None
+                continue
+            seen_shas.add(sha)
+
             # --- IGNORE AUTOMATED BOTS ---
-            if "bot" in author.lower() or "github-actions" in author.lower():
+            if "bot" in author_name.lower() or "github-actions" in author_name.lower() or "bot" in author_email.lower():
                 current_author = None
                 continue
 
-            # -----------------------------
-            current_author = author
+            # Map author to canonical team member name
+            canonical_author = AUTHOR_MAPPING.get(
+                author_name.lower(),
+                AUTHOR_MAPPING.get(author_email.lower(), author_name)
+            )
+
+            current_author = canonical_author
             current_date_str = date_str
 
             students[current_author]["commits"] += 1
@@ -158,14 +217,17 @@ def get_git_metrics(interval="weekly"):
 
                 if interval == "weekly":
                     period_key = dt.strftime("%a (%b %d)")
+                    period_order[period_key] = dt
 
                 elif interval == "monthly":
                     period_key = (
                         f"{dt.isocalendar()[0]}-W{dt.isocalendar()[1]:02d}"
                     )
+                    period_order[period_key] = dt
 
                 else:
                     period_key = dt.strftime("%Y-%m")
+                    period_order[period_key] = dt
 
                 timeline_activity[period_key][current_author] += 1
 
@@ -179,15 +241,21 @@ def get_git_metrics(interval="weekly"):
                 students[current_author]["added"] += int(parts[0])
                 students[current_author]["deleted"] += int(parts[1])
 
-    return students, timeline_activity, student_logs, scope_title
+    return students, timeline_activity, student_logs, scope_title, period_order
 
 
-def create_charts(students, timeline_activity, interval):
+def create_charts(students, timeline_activity, interval, period_order=None):
     """Generates visual workload and trend charts."""
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 3.8))
 
-    authors = list(students.keys())
-    periods = sorted(timeline_activity.keys())
+    authors = [a for a in students.keys() if students[a]["commits"] > 0]
+    if not authors:
+        authors = list(students.keys())
+
+    if period_order:
+        periods = sorted(timeline_activity.keys(), key=lambda p: period_order.get(p, p))
+    else:
+        periods = sorted(timeline_activity.keys())
 
     # 1. Timeline Line Chart
     if periods and authors:
@@ -274,11 +342,12 @@ def create_charts(students, timeline_activity, interval):
     return Image(img_buffer, width=500, height=170)
 
 
-def generate_pdf(interval="weekly"):
+def generate_pdf(interval="weekly", since_override=None):
     repo_name, branch_name = get_repo_info()
 
-    students, timeline_activity, student_logs, scope_title = get_git_metrics(
-        interval
+    students, timeline_activity, student_logs, scope_title, period_order = get_git_metrics(
+        interval,
+        since_override=since_override,
     )
 
     if students is None:
@@ -615,6 +684,7 @@ def generate_pdf(interval="weekly"):
         students,
         timeline_activity,
         interval,
+        period_order=period_order,
     )
 
     story.append(chart_image)
@@ -644,7 +714,7 @@ def generate_pdf(interval="weekly"):
             student_section.append(
                 Paragraph(
                     f"<b>Student:</b> "
-                    f"{html.escape(student_name)} — "
+                    f"{html.escape(student_name)} - "
                     f"<i>{len(logs)} commit(s)</i>",
                     sub_section_style,
                 )
@@ -898,5 +968,6 @@ if __name__ == "__main__":
         if len(sys.argv) > 1
         else "weekly"
     )
+    since_arg = sys.argv[2] if len(sys.argv) > 2 else None
 
-    generate_pdf(chosen_interval)
+    generate_pdf(chosen_interval, since_override=since_arg)
