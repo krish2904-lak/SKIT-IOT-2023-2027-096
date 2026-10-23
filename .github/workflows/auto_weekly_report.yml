@@ -10,7 +10,7 @@ on:
 permissions:
   contents: write
 
-# Prevent overlapping runs from pushing at the same time.
+# Prevent overlapping runs from pushing simultaneously.
 concurrency:
   group: weekly-progress-report
   cancel-in-progress: false
@@ -48,19 +48,31 @@ jobs:
 
           mkdir -p weekly_reports
 
+          # Find generated PDFs in the repository root.
           shopt -s nullglob
           reports=( *_Weekly_Progress_Report_Form-3_*.pdf )
 
-          if [ ${#reports[@]} -eq 0 ]; then
-            echo "Error: No generated weekly PDF report found."
+          # Move matching PDFs into weekly_reports/.
+          if [ ${#reports[@]} -gt 0 ]; then
+            for report in "${reports[@]}"; do
+              mv -- "$report" weekly_reports/
+            done
+          fi
+
+          # Verify that a PDF exists in the destination directory.
+          if ! find weekly_reports -maxdepth 1 -type f -name '*.pdf' -print -quit | grep -q .; then
+            echo "ERROR: No PDF found in the repository root or weekly_reports/."
+            echo "Check the output filename and location in generate_report.py."
+            echo "Files in the repository root:"
+            ls -la
             exit 1
           fi
 
-          mv -- "${reports[@]}" weekly_reports/
-
+          # Configure Git identity.
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          # Stage reports.
           git add -f weekly_reports/
 
           if git diff --cached --quiet; then
@@ -68,11 +80,12 @@ jobs:
             exit 0
           fi
 
+          # Commit the generated report.
           git commit -m "docs: archive Form-3 weekly progress report [skip ci]"
 
-          # Incorporate remote changes before pushing.
+          # Synchronize with the latest remote main branch.
           git fetch origin main
           git rebase origin/main
 
-          # Push only if the rebase completed successfully.
+          # Push the rebased commit.
           git push origin HEAD:main
