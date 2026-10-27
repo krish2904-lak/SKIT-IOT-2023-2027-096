@@ -1,0 +1,121 @@
+[
+  {
+    "description": "CSE-IoT Student with hardware and embedded background",
+    "student_id": "SKIT/2023/CSE-IOT/001",
+    "branch": "CSE (IoT)",
+    "semester": 6,
+    "cgpa": 8.4,
+    "academic_scores": {
+      "web_technologies": 68.0,
+      "dbms": 74.0,
+      "dsa": 80.0,
+      "iot_embedded": 94.0,
+      "ml_math": 72.0,
+      "cloud_computing": 76.0,
+      "operating_systems": 86.0
+    },
+    "interests": ["iot_embedded", "cloud_devops"],
+    "skills": [
+      {"name": "cpp", "level": "advanced"},
+      {"name": "esp32", "level": "advanced"},
+      {"name": "arduino", "level": "intermediate"},
+      {"name": "mqtt", "level": "intermediate"},
+      {"name": "python", "level": "intermediate"}
+    ],
+    "projects_completed": 4,
+    "certifications_count": 2,
+    "expected_target": "IOT_EMBEDDED_SYSTEMS"
+  },
+  {
+    "description": "Student focused on Full-Stack Web Development",
+    "student_id": "SKIT/2023/CSE/042",
+    "branch": "CSE",
+    "semester": 6,
+    "cgpa": 8.1,
+    "academic_scores": {
+      "web_technologies": 95.0,
+      "dbms": 88.0,
+      "dsa": 78.0,
+      "iot_embedded": 60.0,
+      "ml_math": 68.0,
+      "cloud_computing": 82.0,
+      "operating_systems": 72.0
+    },
+    "interests": ["web_development", "cloud_devops"],
+    "skills": [
+      {"name": "javascript", "level": "advanced"},
+      {"name": "react", "level": "advanced"},
+      {"name": "nodejs", "level": "intermediate"},
+      {"name": "mongodb", "level": "intermediate"},
+      {"name": "html_css", "level": "advanced"}
+    ],
+    "projects_completed": 3,
+    "certifications_count": 1,
+    "expected_target": "MERN_FULL_STACK"
+  },
+  {
+    "description": "Student targeting AI and Machine Learning",
+    "student_id": "SKIT/2023/CSE-AIML/015",
+    "branch": "CSE (AI/ML)",
+    "semester": 6,
+    "cgpa": 8.8,
+    "academic_scores": {
+      "web_technologies": 65.0,
+      "dbms": 82.0,
+      "dsa": 86.0,
+      "iot_embedded": 62.0,
+      "ml_math": 96.0,
+      "cloud_computing": 78.0,
+      "operating_systems": 80.0
+    },
+    "interests": ["ai_ml", "data_analytics"],
+    "skills": [
+      {"name": "python", "level": "advanced"},
+      {"name": "scikit_learn", "level": "advanced"},
+      {"name": "pytorch", "level": "intermediate"},
+      {"name": "sql", "level": "intermediate"},
+      {"name": "fastapi", "level": "beginner"}
+    ],
+    "projects_completed": 3,
+    "certifications_count": 2,
+    "expected_target": "AI_ML_ENGINEERING"
+  },
+  {
+    "description": "Student aiming for Cloud Architecture & DevOps",
+    "student_id": "SKIT/2023/IT/088",
+    "branch": "Information Technology",
+    "semester": 7,
+    "cgpa": 7.9,
+    "academic_scores": {
+      "web_technologies": 70.0,
+      "dbms": 78.0,
+      "dsa": 74.0,
+      "iot_embedded": 55.0,
+      "ml_math": 65.0,
+      "cloud_computing": 94.0,
+      "operating_systems": 90.0
+    },
+    "interests": ["cloud_devops"],
+    "skills": [
+      {"name": "docker", "level": "advanced"},
+      {"name": "linux", "level": "advanced"},
+      {"name": "aws", "level": "intermediate"},
+      {"name": "git", "level": "advanced"},
+      {"name": "kubernetes", "level": "beginner"}
+    ],
+    "projects_completed": 2,
+    "certifications_count": 2,
+    "expected_target": "CLOUD_DEVOPS"
+  },
+  {
+    "description": "Minimal student profile with defaults and missing academic scores",
+    "student_id": "SKIT/2023/CSE/999",
+    "branch": "CSE",
+    "semester": 5,
+    "cgpa": 7.2,
+    "interests": ["web_development"],
+    "skills": ["javascript", "html"],
+    "projects_completed": 1,
+    "expected_target": "MERN_FULL_STACK"
+  }
+]
