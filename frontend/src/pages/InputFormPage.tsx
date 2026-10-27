@@ -10,41 +10,33 @@ import { ProfileReadinessCard } from '../components/inputs/ProfileReadinessCard'
 interface InputFormPageProps {
   student: StudentProfile | null;
   onSubmit: (data: StudentInputFormData) => Promise<boolean>;
+  onUploadResume: (file: File) => Promise<boolean>;
   isSubmitting: boolean;
 }
 
 export const InputFormPage: React.FC<InputFormPageProps> = ({
   student,
   onSubmit,
+  onUploadResume,
   isSubmitting,
 }) => {
   // Local state for inputs
-  const [selectedDomains, setSelectedDomains] = useState<string[]>(
-    student?.interests ?? [
-      'Full-Stack Web Development',
-      'Internet of Things (IoT) & Embedded Firmware',
-      'Applied Artificial Intelligence / Machine Learning',
-    ]
-  );
+  const [selectedDomains, setSelectedDomains] = useState<string[]>(student?.interests ?? []);
 
   const [skills, setSkills] = useState<StudentSkill[]>(
-    student?.skills ?? [
-      { name: 'JavaScript / TypeScript', level: 'Advanced', source: 'SELF_REPORTED' },
-      { name: 'React.js', level: 'Intermediate', source: 'SELF_REPORTED' },
-      { name: 'Database Management Systems (DBMS)', level: 'Advanced', source: 'ERP_COURSEWORK' },
-      { name: 'Computer Networks & IoT Protocols', level: 'Intermediate', source: 'ERP_COURSEWORK' },
-    ]
+    student?.skills.filter((skill) => skill.source === 'SELF_REPORTED') ?? []
   );
+  const sourcedSkills = student?.skills.filter((skill) => skill.source !== 'SELF_REPORTED') ?? [];
 
-  const [preferredRole, setPreferredRole] = useState(
-    'Full-Stack Cloud Engineer'
+  const [preferredRole, setPreferredRole] = useState(student?.preferredCareer ?? '');
+  const [weeklyHours, setWeeklyHours] = useState<number>(student?.weeklyStudyHours ?? 1);
+  const [learningPace, setLearningPace] = useState<'Self-Paced' | 'Intensive' | 'Balanced'>(
+    (student?.learningPace as 'Self-Paced' | 'Intensive' | 'Balanced') ?? 'Balanced'
   );
-  const [weeklyHours, setWeeklyHours] = useState<number>(15);
-  const [learningPace, setLearningPace] = useState<'Self-Paced' | 'Intensive' | 'Balanced'>('Balanced');
   const [resumeUploaded, setResumeUploaded] = useState(student?.resumeUploaded ?? false);
   const [resumeFileName, setResumeFileName] = useState(student?.resumeFileName ?? '');
-  const [projectsCompleted, setProjectsCompleted] = useState<number>(student?.projectsCompleted ?? 3);
-  const [certificationsCount, setCertificationsCount] = useState<number>(student?.certificationsCount ?? 2);
+  const [projectsCompleted, setProjectsCompleted] = useState<number>(student?.projectsCompleted ?? 0);
+  const [certificationsCount, setCertificationsCount] = useState<number>(student?.certificationsCount ?? 0);
   const [academicScores] = useState<AcademicScoresData | undefined>(student?.academicScores);
 
   // Sync state if student prop changes to a different identity
@@ -52,11 +44,11 @@ export const InputFormPage: React.FC<InputFormPageProps> = ({
   if (student && student.id !== prevStudentId) {
     setPrevStudentId(student.id);
     setSelectedDomains(student.interests ?? []);
-    setSkills(student.skills ?? []);
+    setSkills(student.skills.filter((skill) => skill.source === 'SELF_REPORTED'));
     setResumeUploaded(student.resumeUploaded ?? false);
     setResumeFileName(student.resumeFileName ?? '');
-    setProjectsCompleted(student.projectsCompleted ?? 3);
-    setCertificationsCount(student.certificationsCount ?? 2);
+    setProjectsCompleted(student.projectsCompleted ?? 0);
+    setCertificationsCount(student.certificationsCount ?? 0);
   }
 
   // Validation state
@@ -76,7 +68,10 @@ export const InputFormPage: React.FC<InputFormPageProps> = ({
   // Add skill
   const handleAddSkill = (newSkill: StudentSkill) => {
     setSkills((prev) => {
-      if (prev.some((s) => s.name.toLowerCase() === newSkill.name.toLowerCase())) {
+      if (
+        prev.some((s) => s.name.toLowerCase() === newSkill.name.toLowerCase())
+        || sourcedSkills.some((s) => s.name.toLowerCase() === newSkill.name.toLowerCase())
+      ) {
         return prev;
       }
       return [...prev, newSkill];
@@ -98,69 +93,25 @@ export const InputFormPage: React.FC<InputFormPageProps> = ({
     );
   };
 
-  // Resume upload success handler
-  const handleResumeUploadSuccess = (fileName: string, extractedSkills: StudentSkill[]) => {
-    setResumeUploaded(true);
-    setResumeFileName(fileName);
-
-    // Merge extracted skills without duplicates
-    setSkills((prev) => {
-      const existingNames = new Set(prev.map((s) => s.name.toLowerCase()));
-      const newItems = extractedSkills.filter((s) => !existingNames.has(s.name.toLowerCase()));
-      return [...prev, ...newItems];
-    });
+  const handleUploadResume = async (file: File) => {
+    const uploaded = await onUploadResume(file);
+    if (uploaded) {
+      setResumeUploaded(true);
+      setResumeFileName(file.name);
+    }
+    return uploaded;
   };
 
-  // Clear resume
-  const handleClearResume = () => {
-    setResumeUploaded(false);
-    setResumeFileName('');
-    // Optionally remove skills that were sourced from resume
-    setSkills((prev) => prev.filter((s) => s.source !== 'RESUME_PARSED'));
-  };
-
-  // Load demo profile for testing/review
-  const handleLoadDemoProfile = () => {
-    setSelectedDomains([
-      'Full-Stack Web Development',
-      'Internet of Things (IoT) & Embedded Firmware',
-      'Applied Artificial Intelligence / Machine Learning',
-    ]);
-    setSkills([
-      { name: 'JavaScript / TypeScript', level: 'Advanced', source: 'SELF_REPORTED' },
-      { name: 'React.js', level: 'Advanced', source: 'SELF_REPORTED' },
-      { name: 'Database Management Systems (DBMS)', level: 'Advanced', source: 'ERP_COURSEWORK' },
-      { name: 'Computer Networks & IoT Protocols', level: 'Intermediate', source: 'ERP_COURSEWORK' },
-      { name: 'ESP32 Microcontroller', level: 'Intermediate', source: 'SELF_REPORTED' },
-      { name: 'Python Basics', level: 'Intermediate', source: 'RESUME_PARSED' },
-      { name: 'Docker Containerization', level: 'Beginner', source: 'RESUME_PARSED' },
-    ]);
-    setPreferredRole('Full-Stack Cloud Engineer');
-    setWeeklyHours(20);
-    setLearningPace('Balanced');
-    setProjectsCompleted(4);
-    setCertificationsCount(2);
-    setResumeUploaded(true);
-    setResumeFileName('Prachi_Bhardwaj_Resume_2026.pdf');
-    setErrors({});
-  };
-
-  // Reset to ERP baseline
-  const handleResetBaseline = () => {
-    setSelectedDomains(['Full-Stack Web Development']);
-    setSkills(
-      student?.skills.filter((s) => s.source === 'ERP_COURSEWORK') ?? [
-        { name: 'Database Management Systems (DBMS)', level: 'Advanced', source: 'ERP_COURSEWORK' },
-        { name: 'Computer Networks & IoT Protocols', level: 'Intermediate', source: 'ERP_COURSEWORK' },
-      ]
-    );
-    setPreferredRole('Software Engineer');
-    setWeeklyHours(15);
-    setLearningPace('Balanced');
-    setProjectsCompleted(1);
-    setCertificationsCount(0);
-    setResumeUploaded(false);
-    setResumeFileName('');
+  const handleReset = () => {
+    setSelectedDomains(student?.interests ?? []);
+    setSkills(student?.skills.filter((skill) => skill.source === 'SELF_REPORTED') ?? []);
+    setPreferredRole(student?.preferredCareer ?? '');
+    setWeeklyHours(student?.weeklyStudyHours ?? 1);
+    setLearningPace((student?.learningPace as 'Self-Paced' | 'Intensive' | 'Balanced') ?? 'Balanced');
+    setResumeUploaded(student?.resumeUploaded ?? false);
+    setResumeFileName(student?.resumeFileName ?? '');
+    setProjectsCompleted(student?.projectsCompleted ?? 0);
+    setCertificationsCount(student?.certificationsCount ?? 0);
     setErrors({});
   };
 
@@ -224,8 +175,8 @@ export const InputFormPage: React.FC<InputFormPageProps> = ({
             Student Profile & Technical Input Questionnaire
           </h2>
           <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
-            Vectorize your technical proficiencies, career aspirations, and project milestones alongside
-            verified SKIT ERP academic records to generate personalized tech-stack recommendations.
+            Add your technical skills, interests, and project counts alongside
+            any available trusted academic records to generate personalized tech-stack recommendations.
           </p>
         </div>
 
@@ -259,11 +210,9 @@ export const InputFormPage: React.FC<InputFormPageProps> = ({
       <ProfileReadinessCard
         hasErpLinked={Boolean(student?.erpCourses && student.erpCourses.length > 0)}
         selectedDomainsCount={selectedDomains.length}
-        skills={skills}
+        skills={[...skills, ...sourcedSkills]}
         hasRoleConfigured={Boolean(preferredRole.trim())}
         resumeUploaded={resumeUploaded}
-        onLoadDemoProfile={handleLoadDemoProfile}
-        onResetBaseline={handleResetBaseline}
       />
 
       {/* Section 1: Career Domains */}
@@ -278,14 +227,31 @@ export const InputFormPage: React.FC<InputFormPageProps> = ({
 
       {/* Section 2: Technical Skills Inventory */}
       {(activeSection === 'all' || activeSection === 'skills') && (
-        <SkillInputCollector
-          skills={skills}
-          selectedDomains={selectedDomains}
-          onAddSkill={handleAddSkill}
-          onRemoveSkill={handleRemoveSkill}
-          onUpdateLevel={handleUpdateSkillLevel}
-          error={errors.skills}
-        />
+        <>
+          {sourcedSkills.length > 0 && (
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <h3 className="text-sm font-semibold text-slate-800">Imported skills (read-only)</h3>
+              <p className="mt-1 text-xs text-slate-500">
+                These are retained from trusted academic records or the parsed resume and cannot be edited as self-reported skills.
+              </p>
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {sourcedSkills.map((skill) => (
+                  <li key={`${skill.source}-${skill.name}`} className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-700">
+                    {skill.name} · {skill.source.replaceAll('_', ' ').toLowerCase()}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <SkillInputCollector
+            skills={skills}
+            selectedDomains={selectedDomains}
+            onAddSkill={handleAddSkill}
+            onRemoveSkill={handleRemoveSkill}
+            onUpdateLevel={handleUpdateSkillLevel}
+            error={errors.skills}
+          />
+        </>
       )}
 
       {/* Section 3: Project Milestones & ERP Alignment */}
@@ -323,9 +289,7 @@ export const InputFormPage: React.FC<InputFormPageProps> = ({
         <ResumeUploadDropzone
           resumeUploaded={resumeUploaded}
           resumeFileName={resumeFileName}
-          onUploadSuccess={handleResumeUploadSuccess}
-          onClearResume={handleClearResume}
-          existingSkills={skills}
+          onUploadFile={handleUploadResume}
         />
       )}
 
@@ -357,10 +321,10 @@ export const InputFormPage: React.FC<InputFormPageProps> = ({
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
               type="button"
-              onClick={handleResetBaseline}
+              onClick={handleReset}
               className="px-3 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition cursor-pointer"
             >
-              Reset
+              Discard edits
             </button>
 
             <button

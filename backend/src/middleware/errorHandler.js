@@ -18,7 +18,12 @@ function errorHandler(error, _req, res, next) {
     return next(error);
   }
 
-  const requestedStatus = Number(error.statusCode || error.status);
+  const requestedStatus = Number(
+    error.statusCode
+      || error.status
+      || (error.name === 'ValidationError' ? 400 : undefined)
+      || (error.name === 'MulterError' && error.code === 'LIMIT_FILE_SIZE' ? 413 : undefined)
+  );
   const statusCode = Number.isInteger(requestedStatus)
     && requestedStatus >= 400
     && requestedStatus <= 599

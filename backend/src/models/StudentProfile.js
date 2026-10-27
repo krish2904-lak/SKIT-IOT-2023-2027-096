@@ -70,7 +70,14 @@ const studentProfileSchema = new mongoose.Schema(
       ref: 'ERPRecord',
       default: null,
     },
+    resumeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ResumeRecord',
+      default: null,
+    },
     skills: { type: [skillSchema], default: [] },
+    projectsCompleted: { type: Number, min: 0, max: 20, default: 0, validate: Number.isInteger },
+    certificationsCount: { type: Number, min: 0, max: 10, default: 0, validate: Number.isInteger },
     interests: {
       type: [interestSchema],
       default: [],

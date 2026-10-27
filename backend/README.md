@@ -1,136 +1,61 @@
-# F-096 Backend Foundation
+# F-096 Backend
 
-## Purpose
+The Express API owns profile data, resume metadata, and persisted recommendation runs. It validates externally issued HS256 bearer tokens, scopes student records to the token subject, and proxies recommendation and resume-parsing requests to the FastAPI model service. The browser never calls FastAPI directly.
 
-This is the independently runnable Node.js API foundation for F-096. It provides an Express health endpoint, shared 404/error handling, MongoDB connection management, and the initial student profile/ERP data models. Authentication, student APIs, recommendations, ML, and AI are not implemented.
+## Runtime requirements
 
-The API uses the response and error conventions in [`../docs/API_CONTRACT.md`](../docs/API_CONTRACT.md). In particular, successful responses are wrapped in `{ "success": true, "data": ... }`; unexpected HTTP 500 errors use the contract's `INTERNAL_ERROR` code.
+- Node.js 20.19 or later
+- MongoDB
+- Python dependencies from `ai-service/requirements.txt` and a working model setup
+- An external identity provider that issues compatible HS256 access tokens
 
-## Tech Stack
+There is no registration, login, or token-issuance endpoint. Configure `JWT_SECRET` to the same secret used by the trusted issuer. It must contain at least 32 UTF-8 bytes. The API accepts tokens with a non-empty `sub`, integer `iat` and `exp`, valid HS256 signature, and an age no greater than 15 minutes.
 
-- Node.js (20.19.0 or later)
-- Express
-- dotenv
-- cors
-- helmet
-- morgan
-- Mongoose
+## Local setup
 
-## Folder Structure
+1. Copy `.env.example` to `.env`. Set `MONGODB_URI` and `JWT_SECRET`. Do not commit `.env` or share its secret.
+2. Start the model service from `ai-service/`:
 
-```text
-backend/
-├── src/
-│   ├── config/       Environment and MongoDB connection configuration
-│   ├── controllers/  HTTP request/response handling
-│   ├── middleware/   404 and centralized error handling
-│   ├── models/      StudentProfile and ERPRecord schemas
-│   ├── routes/       Route definitions
-│   ├── services/    Reserved for future business logic; currently empty
-│   ├── utils/        Reserved for shared utilities
-│   ├── app.js        Express middleware and route setup
-│   └── server.js     HTTP server startup
-├── scripts/
-│   └── seed.js      Explicit development-only synthetic seed
-├── .env.example
-├── .gitignore
-├── package.json
-├── package-lock.json
-└── README.md
+   ```powershell
+   python -m pip install -r requirements.txt
+   python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+   ```
+
+3. Start Express from `backend/`:
+
+   ```powershell
+   npm ci
+   npm run dev
+   ```
+
+4. Start the frontend from `frontend/` with `npm ci` and `npm run dev`. The Vite development server proxies `/api` to `http://127.0.0.1:5000`; `VITE_API_BASE_URL` can override the frontend API base URL.
+
+`GET /api/health` reports database readiness. The API needs a trusted ERP snapshot before recommendations can be generated. No institutional ERP connector is configured, so `POST /api/profile/erp` returns `503 SERVICE_UNAVAILABLE`. For local-only synthetic testing, `npm run seed` creates a clearly synthetic profile and ERP record while `NODE_ENV=development`; it does not create an account or issue a token.
+
+## API behavior
+
+All success responses use `{ "success": true, "data": ... }`; errors use `{ "success": false, "error": { "code", "message", "details", "requestId" } }`.
+
+| Route | Behavior |
+|---|---|
+| `GET /api/health` | Public liveness and MongoDB readiness. |
+| `GET /api/profile` | Returns the authenticated user's profile, linked trusted ERP snapshot, and latest parsed-resume metadata. |
+| `PUT /api/profile` | Creates or updates editable profile fields. Browser-submitted skills are always self-reported and unverified; existing ERP/resume-sourced skills are preserved. |
+| `POST /api/profile/erp` | Returns `503` until a trusted ERP connector is configured. |
+| `POST /api/profile/resume` | Parses one PDF or DOCX up to 5 MiB and returns `201`. The file is held in memory for parsing and is not retained; parsed metadata and skill names are persisted. |
+| `GET /api/recommendations` | Lists the authenticated user's stored candidates; supports `page`, `limit` (1–100), and exact `category`. |
+| `POST /api/recommendations` | Calls FastAPI using canonical profile/ERP/resume data and stores the returned candidates. A trusted ERP snapshot is required. |
+| `GET /api/recommendations/:id` | Returns an owned recommendation. |
+| `GET /api/recommendations/:id/explanation` | Returns the stored model explanation. |
+| `GET /api/recommendations/:id/roadmap` | Returns the stored roadmap. |
+| `GET /api/history` | Lists one latest-ranked summary per generated run; history is automatic and has no separate save operation. |
+
+Recommendation model scores are returned on a `0_TO_100` scale but are marked `UNCALIBRATED`; they are not probabilities, confidence, or outcome guarantees. The separate `confidence.value` remains `null`. SHAP contributions are model attributions on the model's probability output scale, not score boosts. Missing matched ERP subject scores are omitted by the adapter, then currently receive FastAPI's schema default of `70.0`; disclose this model-side default rather than presenting it as an ERP fact. The adapter supplies the actual ERP CGPA and other canonical values.
+
+## Tests
+
+From `backend/`, run:
+
+```powershell
+npm test
 ```
-
-The `services` and `utils` directories are intentionally empty until their features are approved for a later phase.
-
-## Phase 3 Database Design
-
-`StudentProfile` stores the account reference expected by the API contract, display identity, student-declared skills/interests, and learning preferences. Academic facts are kept in separate `ERPRecord` snapshots so trusted ERP data is not mixed with editable profile input and can evolve for future feature extraction. `User` is deferred because authentication is out of scope; `userId` is currently an opaque string reference. Resume metadata/storage is also deferred until its upload lifecycle is implemented. Recommendations/history are not modeled in this phase.
-
-Indexes are deliberately limited:
-
-- `StudentProfile.userId` is unique because profile lookups are by account and one profile belongs to one user.
-- `ERPRecord.profileId + syncedAt` supports loading a student's most recent ERP snapshot.
-- `ERPRecord.source + externalStudentId` supports lookup during trusted ERP synchronization; it is non-unique because snapshots may be retained over time.
-
-Schema validation covers required identity and academic fields, enum values, unique interest priorities/domains, CGPA against its configured scale, bounded semester and score/attendance ranges, and Mongoose timestamps.
-
-## Installation
-
-From this directory:
-
-```bash
-npm install
-```
-
-MongoDB must be running and reachable before the backend starts. Copy `.env.example` to `.env` for local configuration. Do not commit `.env` or place credentials in source code.
-
-For a local MongoDB instance, the example URI is:
-
-```text
-mongodb://localhost:27017/f096_stack_recommendation
-```
-
-Set `MONGODB_URI` to a private MongoDB Atlas URI only in your local environment if using Atlas. No Atlas account or cloud resource is created by this project.
-
-## Environment Variables
-
-| Variable | Default | Purpose |
-|---|---|---|
-| `PORT` | `5000` | HTTP listening port; must be an integer from 1 to 65535. |
-| `NODE_ENV` | `development` | Runtime environment included in the health response. |
-| `MONGODB_URI` | None; required | MongoDB connection URI. The server fails startup if it is missing or unreachable. |
-
-## Development Command
-
-```bash
-npm run dev
-```
-
-Uses Node's built-in `--watch` mode; nodemon is not required.
-MongoDB connection must succeed before the HTTP server begins listening.
-
-## Production Command
-
-```bash
-npm start
-```
-
-Production startup also requires a reachable MongoDB instance and `MONGODB_URI`.
-
-## Development Seed
-
-With `NODE_ENV=development` and MongoDB available, run:
-
-```bash
-npm run seed
-```
-
-This explicitly upserts one synthetic `Demo Student` profile and its ERP snapshot. It is never run automatically at server startup. Stable seed keys and `$setOnInsert` prevent duplicate records and avoid overwriting existing seed data on repeated runs. The script refuses to run unless `NODE_ENV=development`.
-
-## Database Models
-
-- `StudentProfile`: opaque `userId`, display name, college, current ERP record reference, skills, interests, career/learning preferences, and timestamps.
-- `ERPRecord`: profile reference, source and external record key, branch/section, semester/year, CGPA and scale, attendance, subjects/marks/grades/credits, sync status/time, and timestamps.
-
-CGPA and semester belong to ERP records per the API contract, not to editable profile fields. No password or resume file is stored in either model.
-
-## Health Endpoint
-
-`GET http://localhost:5000/api/health` is public and returns HTTP 200 only while Mongoose reports an active database connection. If MongoDB disconnects after startup, the endpoint returns HTTP 503 using the contract error envelope. It never reports `database: "connected"` based on configuration alone.
-
-Example response:
-
-```json
-{
-  "success": true,
-  "data": {
-    "status": "ok",
-    "message": "F-096 backend is running",
-    "service": "backend",
-    "environment": "development",
-    "database": "connected",
-    "timestamp": "2026-10-01T09:30:00.000Z"
-  }
-}
-```
-
-Unknown paths return HTTP 404 with the API contract error envelope and code `NOT_FOUND`. Unexpected HTTP 500 responses use code `INTERNAL_ERROR` and do not expose stack traces.

@@ -47,10 +47,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       <div className="flex-1 flex flex-col min-w-0">
         <Header
           activeTab={activeTab}
-          studentName={student?.name ?? 'Prachi Bhardwaj'}
-          rollNumber={student?.erpStudentId ?? '21ESKCS096'}
-          branch={student?.branch ?? 'CSE (IoT)'}
-          lastSync={student?.lastErpSync ?? 'Just now'}
+          studentName={student?.name ?? 'Student'}
+          rollNumber={student?.erpStudentId ?? null}
+          branch={student?.branch ?? null}
+          lastSync={student?.lastErpSync ?? null}
+          hasErpRecords={Boolean(student?.erpCourses?.length)}
           isSyncing={isSyncingErp}
           onSyncErp={onSyncErp}
           onToggleMobileNav={() => setIsMobileNavOpen((prev) => !prev)}
@@ -69,7 +70,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             <div className="flex-1 text-xs">
               <span className="font-bold text-slate-900 block">Institutional ERP Update</span>
               <p className="text-slate-600 mt-0.5 leading-relaxed">{syncNotification}</p>
-              <span className="font-mono text-[10px] text-emerald-600 mt-1 inline-block">SKIT College API • Verified</span>
+              <span className="font-mono text-[10px] text-slate-500 mt-1 inline-block">ERP connector status</span>
             </div>
           </div>
         )}

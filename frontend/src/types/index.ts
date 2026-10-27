@@ -1,7 +1,4 @@
-// Core Data Types for Tech-Stack Recommendation Platform
-// Bridges College ERP Records, Student Inputs, and AI/SHAP Predictions
-
-export type SkillLevel = 'Beginner' | 'Intermediate' | 'Advanced';
+export type SkillLevel = 'Beginner' | 'Intermediate' | 'Advanced' | 'Unknown';
 export type SkillSource = 'ERP_COURSEWORK' | 'SELF_REPORTED' | 'RESUME_PARSED';
 
 export interface StudentSkill {
@@ -17,8 +14,8 @@ export interface ErpCourseRecord {
   credits: number;
   theoryScore?: number; // out of 100
   practicalScore?: number; // out of 100
-  grade: 'A+' | 'A' | 'B+' | 'B' | 'C' | 'P' | 'F';
-  attendancePercent: number;
+  grade?: string | null;
+  attendancePercent?: number | null;
 }
 
 export interface SemesterSgpaRecord {
@@ -31,25 +28,28 @@ export interface SemesterSgpaRecord {
 
 export interface StudentProfile {
   id: string;
-  erpStudentId: string;
+  erpStudentId: string | null;
   name: string;
-  email: string;
+  email: string | null;
   college: string;
-  branch: string;
-  section: string;
-  semester: number;
-  cgpa: number;
-  academicYear: string;
+  branch: string | null;
+  section: string | null;
+  semester: number | null;
+  cgpa: number | null;
+  academicYear: string | null;
   interests: string[];
   skills: StudentSkill[];
   resumeUploaded: boolean;
   resumeFileName?: string;
-  lastErpSync: string;
+  lastErpSync: string | null;
   erpCourses?: ErpCourseRecord[];
   sgpaHistory?: SemesterSgpaRecord[];
   projectsCompleted?: number;
   certificationsCount?: number;
   academicScores?: AcademicScoresData;
+  preferredCareer?: string | null;
+  weeklyStudyHours?: number | null;
+  learningPace?: string | null;
 }
 
 export interface AcademicScoresData {
@@ -82,8 +82,8 @@ export interface RecommendationItem {
   id: string;
   title: string;
   category: string;
-  matchScore: number; // 0-100%
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
+  modelScore: number; // Uncalibrated model ranking score on a 0-100 scale.
+  difficulty: 'Beginner' | 'Intermediate' | 'Advanced' | 'Unknown';
   estimatedTimeToLearn: string;
   targetRoles: string[];
   technologies: TechItem[];
@@ -95,9 +95,9 @@ export interface RecommendationItem {
 export interface FeatureImpact {
   featureName: string;
   displayName: string;
-  shapValue: number; // positive or negative float (-1.0 to +1.0 or percentage)
+  shapValue: number | null;
   impactDirection: 'POSITIVE' | 'NEGATIVE';
-  category: 'ERP_ACADEMICS' | 'STUDENT_INTEREST' | 'EXISTING_SKILL' | 'INDUSTRY_DEMAND';
+  category: 'ERP_ACADEMICS' | 'STUDENT_INTEREST' | 'EXISTING_SKILL' | 'INDUSTRY_DEMAND' | 'UNKNOWN';
   explanationNote: string;
   remedyElective?: string;
   potentialBoost?: number;
@@ -106,7 +106,7 @@ export interface FeatureImpact {
 export interface StackExplanation {
   recommendationId: string;
   recommendationTitle: string;
-  baseConfidence: number;
+  baseConfidence: number | null;
   summaryText: string;
   topPositiveFactors: FeatureImpact[];
   topNegativeFactors: FeatureImpact[];
@@ -116,9 +116,9 @@ export interface StackExplanation {
 export interface SavedRecommendationHistoryItem {
   id: string;
   runDate: string;
-  semesterRecorded: number;
+  semesterRecorded: number | null;
   topStackTitle: string;
-  matchScore: number;
+  modelScore: number | null;
   technologiesSummary: string[];
   keyFactor: string;
   targetRole: string;
@@ -145,4 +145,3 @@ export type DashboardTab =
   | 'explanation'
   | 'history'
   | 'compare';
-

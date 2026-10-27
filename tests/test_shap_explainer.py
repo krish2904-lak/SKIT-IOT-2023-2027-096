@@ -79,6 +79,16 @@ def test_explainer_output_shape_and_frontend_contract(explainer, sample_profiles
         assert 1 <= len(sentences) <= 3
 
 
+def test_ranked_explanations_include_model_catalog_prerequisites(explainer, sample_profiles):
+    explanations = explainer.explain_student(sample_profiles[0], top_k=3)
+
+    assert len(explanations) == 3
+    for item in explanations:
+        prerequisites = item["explanation"]["learning_prerequisites"]
+        assert isinstance(prerequisites, list)
+        assert all(isinstance(value, str) for value in prerequisites)
+
+
 def test_explainer_base_confidence_in_bounds(explainer, sample_profiles):
     """Base confidence prior probability must strictly be in [0.0, 1.0]."""
     for profile in sample_profiles:

@@ -33,14 +33,14 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
         <div className="relative z-10 max-w-2xl">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-400/30 mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            ERP Integration Active
+            {student.erpCourses?.length ? 'Trusted ERP snapshot linked' : 'Profile connected'}
           </span>
           <h2 className="text-xl sm:text-2xl font-bold tracking-tight">
             Welcome back, {student.name}!
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
-            Your college ERP records (Semesters 1–5) and technical skills are synced. Our Random
-            Forest ML model evaluates your profile against current industry tech stacks.
+            Review your saved profile data and generate technology recommendations from the
+            trusted academic records and student-provided information available to your account.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 mt-5">
@@ -66,30 +66,30 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Cumulative GPA"
-          value={`${student.cgpa.toFixed(2)} / 10`}
-          subtitle="Verified via SKIT ERP"
-          badge="Semesters 1-5"
+          value={student.cgpa === null ? 'Not available' : `${student.cgpa.toFixed(2)} / 10`}
+          subtitle={student.cgpa === null ? 'No trusted ERP snapshot' : 'From linked ERP snapshot'}
+          badge={student.semester === null ? 'No semester data' : `Semester ${student.semester}`}
           accentColor="emerald"
         />
         <StatCard
           title="Active Skills"
           value={`${student.skills.length} Recorded`}
-          subtitle="ERP + Self + Resume"
-          badge="Profile Ingested"
+          subtitle="Profile and parsed resume"
+          badge="Profile data"
           accentColor="blue"
         />
         <StatCard
-          title="Top Matched Stack"
-          value={topRecommendation ? `${topRecommendation.matchScore}% Match` : '94% Match'}
-          subtitle={topRecommendation?.title.split('(')[0] || 'Full-Stack Cloud'}
-          badge="Random Forest"
+          title="Top Recommendation"
+          value={topRecommendation ? `${topRecommendation.modelScore}/100` : 'Not generated'}
+          subtitle={topRecommendation?.title || 'Generate recommendations from your profile'}
+          badge="Uncalibrated model score"
           accentColor="indigo"
         />
         <StatCard
           title="Pipeline Status"
-          value="Evaluated"
-          subtitle="TreeSHAP Available"
-          badge="Live Model"
+          value={topRecommendation ? 'Available' : 'Not run'}
+          subtitle={topRecommendation ? 'Recommendation model ran' : 'No saved recommendation run'}
+          badge="Model status"
           accentColor="amber"
         />
       </div>
@@ -104,19 +104,18 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
                 Top AI Recommendation
               </span>
               <h3 className="text-lg font-bold text-slate-900 mt-0.5">
-                {topRecommendation?.title || 'Full-Stack Cloud Native (MERN + Docker)'}
+                {topRecommendation?.title || 'No recommendation generated yet'}
               </h3>
             </div>
             <div className="text-right">
               <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono">
-                {topRecommendation?.matchScore ?? 94}% Compatibility
+                {topRecommendation ? `Model score ${topRecommendation.modelScore}/100` : 'No model score'}
               </span>
             </div>
           </div>
 
           <p className="text-xs text-slate-600 leading-relaxed">
-            {topRecommendation?.whyRecommendedSnippet ||
-              'High correlation with your A+ in Web Development Lab (95%) and declared interest in Cloud Systems.'}
+            {topRecommendation?.whyRecommendedSnippet || 'Complete your profile inputs and generate recommendations to see model reasoning.'}
           </p>
 
           <div>
@@ -134,16 +133,16 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
             <div className="text-xs text-slate-500">
               Target Career Role:{' '}
               <strong className="text-slate-800">
-                {topRecommendation?.targetRoles[0] || 'Cloud Solutions Associate'}
+                {topRecommendation?.targetRoles[0] || 'Not specified'}
               </strong>
             </div>
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => onNavigate('explanation')}
+                onClick={() => onNavigate('recommendations')}
                 className="px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold border border-blue-200 transition cursor-pointer"
               >
-                Why This Stack? (SHAP Factors) →
+                View recommendation details →
               </button>
             </div>
           </div>
@@ -159,12 +158,12 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
               <div className="flex justify-between py-1 border-b border-slate-100">
                 <span className="text-slate-500">Student Roll No:</span>
                 <span className="font-mono font-medium text-slate-800">
-                  {student.erpStudentId}
+                  {student.erpStudentId || 'Not available'}
                 </span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-100">
                 <span className="text-slate-500">Department:</span>
-                <span className="font-medium text-slate-800">{student.branch}</span>
+                <span className="font-medium text-slate-800">{student.branch || 'Not available'}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-100">
                 <span className="text-slate-500">College:</span>
@@ -174,7 +173,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
               </div>
               <div className="flex justify-between py-1">
                 <span className="text-slate-500">Last Synced:</span>
-                <span className="font-medium text-emerald-600">{student.lastErpSync}</span>
+                <span className="font-medium text-slate-600">{student.lastErpSync || 'Not synchronized'}</span>
               </div>
             </div>
 
@@ -192,7 +191,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
               Model Control
             </h4>
             <p className="text-xs text-slate-500 mb-3">
-              Re-run Random Forest inference using latest synced parameters.
+              Generate a new recommendation run using your saved profile and available ERP snapshot.
             </p>
             <button
               type="button"
@@ -216,118 +215,41 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
         </div>
       </div>
 
-      {/* NEW SECTION: Career Pathway Competency Radar & Academic Milestones */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Domain Competency Distribution */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div>
-              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">
-                Skills Ingestion & Matching
-              </span>
-              <h4 className="text-sm font-bold text-slate-900 mt-0.5">
-                Domain Competency Alignment
-              </h4>
-            </div>
-            <span className="text-xs font-mono font-medium text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-              88% Average Fit
-            </span>
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
+          <h3 className="text-sm font-bold text-slate-900">Profile signals</h3>
+          <p className="mt-1 text-xs text-slate-500">
+            Current user-provided and imported information; no inferred proficiency scores are shown.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {student.interests.length
+              ? student.interests.map((interest) => (
+                <span key={interest} className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs text-blue-800">
+                  {interest}
+                </span>
+              ))
+              : <span className="text-xs text-slate-500">No career interests selected.</span>}
           </div>
-
-          <div className="space-y-3.5 pt-1">
-            <div>
-              <div className="flex justify-between text-xs mb-1">
-                <span className="font-medium text-slate-800">Full-Stack Web & Cloud Systems</span>
-                <span className="font-mono font-bold text-blue-600">94%</span>
-              </div>
-              <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                <div className="bg-blue-600 h-2 rounded-full transition-all duration-700 w-[94%]" />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between text-xs mb-1">
-                <span className="font-medium text-slate-800">Cloud Architecture & DevOps Containerization</span>
-                <span className="font-mono font-bold text-indigo-600">89%</span>
-              </div>
-              <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                <div className="bg-indigo-600 h-2 rounded-full transition-all duration-700 w-[89%]" />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between text-xs mb-1">
-                <span className="font-medium text-slate-800">IoT & Microcontroller Systems (SKIT Specialization)</span>
-                <span className="font-mono font-bold text-cyan-600">82%</span>
-              </div>
-              <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                <div className="bg-cyan-600 h-2 rounded-full transition-all duration-700 w-[82%]" />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between text-xs mb-1">
-                <span className="font-medium text-slate-800">Applied Artificial Intelligence & Data Pipelines</span>
-                <span className="font-mono font-bold text-rose-600">76%</span>
-              </div>
-              <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                <div className="bg-rose-500 h-2 rounded-full transition-all duration-700 w-[76%]" />
-              </div>
-            </div>
-          </div>
+          <p className="mt-4 text-xs text-slate-600">
+            {student.skills.length} profile or resume skills recorded. Edit them in Profile Inputs.
+          </p>
         </div>
-
-        {/* Real-time System & Verification Timeline */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div>
-              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">
-                Audit Trail
-              </span>
-              <h4 className="text-sm font-bold text-slate-900 mt-0.5">
-                Institutional Milestones & Execution
-              </h4>
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
+          <h3 className="text-sm font-bold text-slate-900">Recommendation data status</h3>
+          <dl className="mt-4 space-y-3 text-xs">
+            <div className="flex justify-between gap-4 border-b border-slate-100 pb-2">
+              <dt className="text-slate-500">Trusted ERP snapshot</dt>
+              <dd className="font-medium text-slate-800">{student.erpCourses?.length ? 'Available' : 'Not connected'}</dd>
             </div>
-            <span className="text-[11px] text-slate-500 font-mono">v2.4 Live</span>
-          </div>
-
-          <div className="space-y-3 pt-1">
-            <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold">
-                ✓
-              </div>
-              <div>
-                <div className="text-xs font-bold text-slate-900">SKIT ERP Academic Records Synchronized</div>
-                <div className="text-[11px] text-slate-500">
-                  Semesters 1 to 5 coursework, lab marks, and 8.42 CGPA ingested.
-                </div>
-              </div>
+            <div className="flex justify-between gap-4 border-b border-slate-100 pb-2">
+              <dt className="text-slate-500">Latest recommendation</dt>
+              <dd className="font-medium text-slate-800">{topRecommendation?.title || 'Not generated'}</dd>
             </div>
-
-            <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold">
-                ✓
-              </div>
-              <div>
-                <div className="text-xs font-bold text-slate-900">Random Forest Classifier Inference Done</div>
-                <div className="text-[11px] text-slate-500">
-                  Ranked 4 high-demand career pathways with TreeSHAP factor calculation.
-                </div>
-              </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-slate-500">Score calibration</dt>
+              <dd className="font-medium text-slate-800">{topRecommendation ? 'Uncalibrated model score' : 'Not available'}</dd>
             </div>
-
-            <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold">
-                ✓
-              </div>
-              <div>
-                <div className="text-xs font-bold text-slate-900">Milestone Roadmap Generated</div>
-                <div className="text-[11px] text-slate-500">
-                  Step-by-step curriculum with recommended resource links mapped.
-                </div>
-              </div>
-            </div>
-          </div>
+          </dl>
         </div>
       </div>
     </div>

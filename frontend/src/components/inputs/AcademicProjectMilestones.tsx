@@ -9,24 +9,14 @@ interface AcademicProjectMilestonesProps {
   academicScores?: AcademicScoresData;
 }
 
-const DEFAULT_ACADEMIC_SCORES: AcademicScoresData = {
-  web_technologies: 95.0,
-  dbms: 84.0,
-  dsa: 82.0,
-  iot_embedded: 92.0,
-  ml_math: 78.0,
-  cloud_computing: 80.0,
-  operating_systems: 88.0,
-};
-
-const COURSE_FEATURE_LABELS: { key: keyof AcademicScoresData; label: string; code: string; relevance: string }[] = [
-  { key: 'web_technologies', label: 'Web Technologies & Lab', code: '5CS4-21', relevance: 'MERN & Full-Stack Web' },
-  { key: 'dbms', label: 'Database Management Systems', code: '5CS4-04', relevance: 'Data Engineering & Backend' },
-  { key: 'dsa', label: 'Data Structures & Algorithms', code: '4CS4-02', relevance: 'Core Software & Competitive' },
-  { key: 'iot_embedded', label: 'IoT Sensors & Microcontrollers', code: '4CS4-21', relevance: 'IoT Embedded Systems' },
-  { key: 'ml_math', label: 'Applied AI & Linear Algebra', code: '5CS4-06', relevance: 'AI/ML Engineering' },
-  { key: 'cloud_computing', label: 'Cloud Systems & Virtualization', code: '5CS4-11', relevance: 'Cloud & DevOps' },
-  { key: 'operating_systems', label: 'Operating Systems & Linux', code: '5CS4-05', relevance: 'Systems & Cybersecurity' },
+const COURSE_FEATURE_LABELS: { key: keyof AcademicScoresData; label: string; relevance: string }[] = [
+  { key: 'web_technologies', label: 'Web Technologies', relevance: 'Web development' },
+  { key: 'dbms', label: 'Database Systems', relevance: 'Data and backend' },
+  { key: 'dsa', label: 'Data Structures & Algorithms', relevance: 'Core software' },
+  { key: 'iot_embedded', label: 'IoT & Embedded Systems', relevance: 'IoT and devices' },
+  { key: 'ml_math', label: 'AI, Machine Learning & Mathematics', relevance: 'AI/ML' },
+  { key: 'cloud_computing', label: 'Cloud Computing', relevance: 'Cloud and DevOps' },
+  { key: 'operating_systems', label: 'Operating Systems', relevance: 'Systems software' },
 ];
 
 export const AcademicProjectMilestones: React.FC<AcademicProjectMilestonesProps> = ({
@@ -34,7 +24,7 @@ export const AcademicProjectMilestones: React.FC<AcademicProjectMilestonesProps>
   onChangeProjects,
   certificationsCount,
   onChangeCertifications,
-  academicScores = DEFAULT_ACADEMIC_SCORES,
+  academicScores,
 }) => {
   const getProjectTier = (count: number) => {
     if (count <= 1) return { label: 'Foundational', color: 'bg-slate-100 text-slate-700' };
@@ -55,15 +45,14 @@ export const AcademicProjectMilestones: React.FC<AcademicProjectMilestonesProps>
               3
             </span>
             <h3 className="text-sm font-bold text-slate-900">
-              Project Milestones & Verified ERP Course Alignment
+              Project and Certification Self-Report
             </h3>
             <span className="text-[10px] font-semibold uppercase tracking-wider bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
-              Feature Vector 3 & 4
+              Optional
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Quantify completed project artifacts and track automated ERP academic scores feeding into the
-            Random Forest recommendation engine.
+            Project and certification totals are self-reported. Academic scores below are read-only and shown only when matched in the trusted ERP snapshot.
           </p>
         </div>
       </div>
@@ -111,7 +100,7 @@ export const AcademicProjectMilestones: React.FC<AcademicProjectMilestonesProps>
           <input
             type="range"
             min={0}
-            max={15}
+            max={20}
             value={projectsCompleted}
             onChange={(e) => onChangeProjects(Number(e.target.value))}
             className="w-full accent-blue-600 cursor-pointer"
@@ -178,39 +167,31 @@ export const AcademicProjectMilestones: React.FC<AcademicProjectMilestonesProps>
             className="w-full accent-blue-600 cursor-pointer"
           />
 
-          <div className="flex flex-wrap gap-1.5 pt-1 border-t border-slate-200">
-            <span className="text-[10px] text-slate-400 font-medium">Recognized:</span>
-            {['NPTEL Elite IoT', 'AWS Cloud Practitioner', 'Coursera Deep Learning'].map((cert) => (
-              <span
-                key={cert}
-                className="text-[10px] bg-white border border-slate-200 text-slate-600 px-2 py-0.5 rounded"
-              >
-                {cert}
-              </span>
-            ))}
-          </div>
+          <p className="border-t border-slate-200 pt-2 text-[10px] text-slate-500">
+            Enter only certifications you have earned.
+          </p>
         </div>
       </div>
 
-      {/* Verified ERP Academic Scores Preview Table */}
+      {/* ERP Academic Scores Preview Table */}
       <div className="space-y-3 pt-2 border-t border-slate-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h4 className="text-xs font-bold text-slate-900">
-              Synchronized ERP Academic Scores (0–100 Scale)
+              Matched ERP Academic Scores
             </h4>
             <span className="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.2 rounded">
               Read-Only ERP Sync
             </span>
           </div>
           <span className="text-[11px] text-slate-400 font-mono">
-            Directly mapped to Random Forest vectors
+            Scores are sourced only from linked ERP courses
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {COURSE_FEATURE_LABELS.map((item) => {
-            const score = academicScores[item.key] ?? 75;
+            const score = academicScores?.[item.key];
             return (
               <div
                 key={item.key}
@@ -221,32 +202,20 @@ export const AcademicProjectMilestones: React.FC<AcademicProjectMilestonesProps>
                     <span className="text-xs font-bold text-slate-800 block leading-tight">
                       {item.label}
                     </span>
-                    <span className="text-[10px] font-mono text-slate-400">
-                      {item.code} • {item.relevance}
+                    <span className="text-[10px] text-slate-400">
+                      {item.relevance}
                     </span>
                   </div>
-                  <span
-                    className={`text-xs font-mono font-bold px-1.5 py-0.5 rounded shrink-0 ${
-                      score >= 85
-                        ? 'bg-emerald-50 text-emerald-700'
-                        : score >= 75
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'bg-amber-50 text-amber-700'
-                    }`}
-                  >
-                    {score}%
-                  </span>
+                  {score === undefined
+                    ? <span className="text-[10px] text-slate-400">No matched course</span>
+                    : <span className="text-xs font-mono font-bold text-slate-700">{score.toFixed(1)}%</span>}
                 </div>
 
-                {/* Progress bar */}
-                <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      score >= 85 ? 'bg-emerald-500' : score >= 75 ? 'bg-blue-500' : 'bg-amber-500'
-                    }`}
-                    style={{ width: `${Math.min(100, score)}%` }}
-                  />
-                </div>
+                {score !== undefined && (
+                  <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div className="h-full rounded-full bg-blue-500" style={{ width: `${Math.min(100, score)}%` }} />
+                  </div>
+                )}
               </div>
             );
           })}
