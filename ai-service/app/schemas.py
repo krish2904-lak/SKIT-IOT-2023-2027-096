@@ -65,6 +65,10 @@ class FeatureContributionItem(BaseModel):
     value: float = Field(..., description="Student feature value [0.0 - 1.0]", examples=[1.0])
     shap_value: float = Field(..., description="SHAP attribution impact value", examples=[0.1829])
     direction: str = Field(..., description="Impact direction ('supports' or 'reduces')", examples=["supports"])
+    explanation_note: Optional[str] = Field(
+        None,
+        description="Plain-language description of the model attribution",
+    )
 
 
 class ItemExplanationSchema(BaseModel):
@@ -78,6 +82,10 @@ class ItemExplanationSchema(BaseModel):
     top_features: List[FeatureContributionItem] = Field(
         ...,
         description="Top contributing features sorted by absolute SHAP value impact",
+    )
+    learning_prerequisites: List[str] = Field(
+        default_factory=list,
+        description="Foundational prerequisites for learning the recommended stack",
     )
 
 

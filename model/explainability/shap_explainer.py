@@ -329,6 +329,7 @@ class ShapExplainer:
         for rank, class_idx in enumerate(sorted_indices[:top_k], start=1):
             stack_code = self.classes[class_idx]
             meta = get_stack_metadata(stack_code)
+            stack_features = STACK_FEATURE_MAPPING.get(stack_code, {})
             class_shap = self._extract_class_shap(raw_shap, class_idx)
             base_val = self._extract_base_value(class_idx)
 
@@ -348,6 +349,9 @@ class ShapExplainer:
                     "value": round(f_val, 4),
                     "shap_value": round(s_val, 4),
                     "direction": direction,
+                    "explanation_note": (
+                        f"{get_feature_label(f_name)} contributed {direction} to this stack's model score."
+                    ),
                 })
 
             # Synthesize short summary
@@ -371,6 +375,7 @@ class ShapExplainer:
                 "explanation": {
                     "summary": summary,
                     "top_features": top_contributions,
+                    "learning_prerequisites": stack_features.get("prerequisites", []),
                 },
             })
 
