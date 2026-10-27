@@ -239,10 +239,13 @@ async function uploadResume(req, res) {
   });
 
   try {
-    await StudentProfile.updateOne(
+    const updateResult = await StudentProfile.updateOne(
       { _id: profileData._id, userId: req.userId },
       { $set: { resumeId: resume._id } }
     );
+    if (updateResult.matchedCount === 0) {
+      throw apiError('Profile setup is required', 404, 'NOT_FOUND');
+    }
   } catch (error) {
     await ResumeRecord.deleteOne({ _id: resume._id }).catch((cleanupError) => {
       console.error(`Resume metadata cleanup failed (${cleanupError.name})`);

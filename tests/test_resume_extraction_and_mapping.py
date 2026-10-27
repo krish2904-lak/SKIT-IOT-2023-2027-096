@@ -243,6 +243,9 @@ def test_llm_client_successful_parsing_with_mocked_http():
     assert result.skills[0].level == "advanced"
     assert "cloud_devops" in result.domains
     assert mock_http_client.post.call_count == 1
+    assert mock_http_client.post.call_args.kwargs["headers"]["Authorization"] == (
+        "Bearer sk-mock-key-for-testing"
+    )
 
 
 def test_llm_client_retries_once_on_bad_json():

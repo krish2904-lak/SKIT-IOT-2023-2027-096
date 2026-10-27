@@ -280,6 +280,101 @@ test('resume parser proxy forwards bounded multipart bytes without storing the f
   );
 });
 
+test('resume upload authenticates, stores parsed metadata, and links it to the caller profile', async (t) => {
+  const originals = {
+    profileFindOne: StudentProfile.findOne,
+    profileUpdateOne: StudentProfile.updateOne,
+    resumeCreate: ResumeRecord.create,
+    resumeDeleteOne: ResumeRecord.deleteOne,
+    globalFetch: global.fetch,
+  };
+  const profileId = new mongoose.Types.ObjectId();
+  const resumeId = new mongoose.Types.ObjectId();
+  let insertedResume;
+  let linkedResumeId;
+  let profileExists = true;
+  let cleanupCount = 0;
+  StudentProfile.findOne = async () => ({
+    _id: profileId,
+    userId: 'user-42',
+    toObject() {
+      return { _id: profileId, userId: 'user-42' };
+    },
+  });
+  StudentProfile.updateOne = async (filter, update) => {
+    assert.equal(String(filter._id), String(profileId));
+    assert.equal(filter.userId, 'user-42');
+    linkedResumeId = update.$set.resumeId;
+    return { matchedCount: profileExists ? 1 : 0, modifiedCount: profileExists ? 1 : 0 };
+  };
+  ResumeRecord.create = async (record) => {
+    insertedResume = record;
+    return { _id: resumeId, ...record };
+  };
+  ResumeRecord.deleteOne = async () => {
+    cleanupCount += 1;
+    return { deletedCount: 1 };
+  };
+  global.fetch = async (_url, init) => {
+    const uploaded = init.body.get('file');
+    assert.equal(uploaded.name, 'portfolio.pdf');
+    assert.equal(uploaded.type, 'application/pdf');
+    return Response.json({
+      extracted_skills: [
+        { name: 'Python', level: 'advanced' },
+        { name: 'React', level: 'intermediate' },
+      ],
+      extracted_domains: ['AI', 'Web Development'],
+      projects_count: 2,
+      certifications_count: 1,
+    });
+  };
+  t.after(() => {
+    StudentProfile.findOne = originals.profileFindOne;
+    StudentProfile.updateOne = originals.profileUpdateOne;
+    ResumeRecord.create = originals.resumeCreate;
+    ResumeRecord.deleteOne = originals.resumeDeleteOne;
+    global.fetch = originals.globalFetch;
+  });
+
+  const server = http.createServer(app);
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => new Promise((resolve) => {
+    server.close(resolve);
+    server.closeAllConnections();
+  }));
+  const address = server.address();
+  const form = new FormData();
+  form.append('file', new Blob(['%PDF synthetic resume'], { type: 'application/pdf' }), 'portfolio.pdf');
+  const response = await realFetch(`http://127.0.0.1:${address.port}/api/profile/resume`, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${makeToken()}` },
+    body: form,
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 201);
+  assert.equal(body.data.resume.id, String(resumeId));
+  assert.equal(body.data.resume.fileName, 'portfolio.pdf');
+  assert.deepEqual(body.data.resume.extractedSkills.map((skill) => skill.name), ['Python', 'React']);
+  assert.deepEqual(insertedResume.extractedSkills.map((skill) => skill.level), ['ADVANCED', 'INTERMEDIATE']);
+  assert.equal(insertedResume.projectsCount, 2);
+  assert.equal(insertedResume.certificationsCount, 1);
+  assert.equal(Object.hasOwn(insertedResume, 'buffer'), false);
+  assert.equal(linkedResumeId, resumeId);
+
+  profileExists = false;
+  const orphanedForm = new FormData();
+  orphanedForm.append('file', new Blob(['%PDF synthetic resume'], { type: 'application/pdf' }), 'portfolio.pdf');
+  const orphanedResponse = await realFetch(`http://127.0.0.1:${address.port}/api/profile/resume`, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${makeToken()}` },
+    body: orphanedForm,
+  });
+  assert.equal(orphanedResponse.status, 404);
+  assert.equal(cleanupCount, 1);
+});
+
 test('profile recommendation endpoint is authenticated and persists FastAPI results', async (t) => {
   const originals = {
     profileFindOne: StudentProfile.findOne,

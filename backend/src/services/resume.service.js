@@ -62,9 +62,11 @@ async function parseResume(file, fetchImpl = fetch) {
       !result
       || !Array.isArray(result.extracted_skills)
       || !Array.isArray(result.extracted_domains)
+      || result.extracted_skills.length > 50
+      || result.extracted_domains.length > 30
       || result.extracted_skills.some((skill) =>
-        !skill || typeof skill.name !== 'string' || !skill.name.trim())
-      || result.extracted_domains.some((domain) => typeof domain !== 'string')
+        !skill || typeof skill.name !== 'string' || !skill.name.trim() || skill.name.length > 100)
+      || result.extracted_domains.some((domain) => typeof domain !== 'string' || domain.length > 100)
       || !Number.isSafeInteger(result.projects_count)
       || result.projects_count < 0
       || !Number.isSafeInteger(result.certifications_count)
