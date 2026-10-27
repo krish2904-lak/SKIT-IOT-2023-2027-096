@@ -47,7 +47,7 @@ export const HistoryTable: React.FC<HistoryTableProps> = ({ history, onSelectRun
                 <th className="px-5 py-3">Inference Date</th>
                 <th className="px-5 py-3">Semester</th>
                 <th className="px-5 py-3">Top Recommended Stack</th>
-                <th className="px-5 py-3">Match Score</th>
+                <th className="px-5 py-3">Model Score</th>
                 <th className="px-5 py-3">Target Career Role</th>
                 <th className="px-5 py-3">Primary Factor</th>
                 <th className="px-5 py-3 text-right">Actions</th>
@@ -83,7 +83,7 @@ export const HistoryTable: React.FC<HistoryTableProps> = ({ history, onSelectRun
                   </td>
                   <td className="px-5 py-3.5">
                     <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                      {run.matchScore}%
+                      {run.modelScore ?? 'N/A'}
                     </span>
                   </td>
                   <td className="px-5 py-3.5 text-slate-700 font-medium">
@@ -129,7 +129,7 @@ export const HistoryTable: React.FC<HistoryTableProps> = ({ history, onSelectRun
                 Archived Recommendation Snapshot
               </span>
               <h4 className="text-base font-bold text-white mt-0.5">
-                {selectedItem.topStackTitle} ({selectedItem.matchScore}% Compatibility)
+                {selectedItem.topStackTitle} (model score: {selectedItem.modelScore ?? 'N/A'})
               </h4>
             </div>
             <button

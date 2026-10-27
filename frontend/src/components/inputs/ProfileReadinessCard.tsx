@@ -7,8 +7,6 @@ interface ProfileReadinessCardProps {
   skills: StudentSkill[];
   hasRoleConfigured: boolean;
   resumeUploaded: boolean;
-  onLoadDemoProfile?: () => void;
-  onResetBaseline?: () => void;
 }
 
 export const ProfileReadinessCard: React.FC<ProfileReadinessCardProps> = ({
@@ -17,39 +15,36 @@ export const ProfileReadinessCard: React.FC<ProfileReadinessCardProps> = ({
   skills,
   hasRoleConfigured,
   resumeUploaded,
-  onLoadDemoProfile,
-  onResetBaseline,
 }) => {
-  // Vector checkpoints calculation
   const checks = [
     {
-      label: 'Verified ERP Academic Records',
+      label: 'Trusted ERP snapshot',
       met: hasErpLinked,
-      detail: hasErpLinked ? '7 Coursework marks synchronized' : 'ERP connection pending',
+      detail: hasErpLinked ? 'Snapshot linked' : 'No trusted snapshot linked',
       weight: 20,
     },
     {
-      label: 'Career Target Domains',
+      label: 'Interest domains',
       met: selectedDomainsCount >= 1,
       detail: selectedDomainsCount >= 1 ? `${selectedDomainsCount} domains selected` : 'Select at least 1 domain',
       weight: 20,
     },
     {
-      label: 'Technical Skills Inventory',
+      label: 'Profile skills',
       met: skills.length >= 2,
       detail: skills.length >= 2 ? `${skills.length} skills recorded` : 'Declare at least 2 skills',
       weight: 20,
     },
     {
-      label: 'Career Role & Workload Pacing',
+      label: 'Career preference',
       met: hasRoleConfigured,
-      detail: hasRoleConfigured ? 'Pacing vector configured' : 'Set preferred target role',
+      detail: hasRoleConfigured ? 'Target role saved' : 'Set a preferred target role',
       weight: 20,
     },
     {
-      label: 'Resume Document NLP Ingestion',
+      label: 'Resume metadata',
       met: resumeUploaded,
-      detail: resumeUploaded ? 'Resume parsed & vectorized' : 'Optional: Upload PDF resume',
+      detail: resumeUploaded ? 'Resume parsed' : 'Optional: upload PDF or DOCX',
       weight: 20,
     },
   ];
@@ -57,9 +52,9 @@ export const ProfileReadinessCard: React.FC<ProfileReadinessCardProps> = ({
   const totalScore = checks.reduce((acc, c) => (c.met ? acc + c.weight : acc), 0);
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return { bg: 'bg-emerald-500', text: 'text-emerald-700', border: 'border-emerald-200', tag: 'High Prediction Confidence' };
-    if (score >= 60) return { bg: 'bg-blue-500', text: 'text-blue-700', border: 'border-blue-200', tag: 'Model-Ready' };
-    return { bg: 'bg-amber-500', text: 'text-amber-700', border: 'border-amber-200', tag: 'Needs Required Vectors' };
+    if (score >= 80) return { bg: 'bg-emerald-500', text: 'text-emerald-700', border: 'border-emerald-200', tag: 'Profile fields complete' };
+    if (score >= 60) return { bg: 'bg-blue-500', text: 'text-blue-700', border: 'border-blue-200', tag: 'Profile in progress' };
+    return { bg: 'bg-amber-500', text: 'text-amber-700', border: 'border-amber-200', tag: 'Add profile information' };
   };
 
   const status = getScoreColor(totalScore);
@@ -74,14 +69,14 @@ export const ProfileReadinessCard: React.FC<ProfileReadinessCardProps> = ({
               ✓
             </span>
             <h3 className="text-sm font-bold text-slate-900">
-              Data Collection Completeness & Vector Health
+              Profile completeness
             </h3>
             <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${status.border} ${status.text} bg-slate-50`}>
               {status.tag}
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Real-time evaluation of student profile vectors required for Random Forest ML inference and SHAP explainability.
+            This checklist counts profile fields only; it is not a model score or recommendation readiness guarantee.
           </p>
         </div>
 
@@ -91,7 +86,7 @@ export const ProfileReadinessCard: React.FC<ProfileReadinessCardProps> = ({
             <div className="text-2xl font-black text-slate-900 font-mono">
               {totalScore}%
             </div>
-            <div className="text-[10px] text-slate-400 font-mono">Profile Vector Health</div>
+            <div className="text-[10px] text-slate-400 font-mono">Profile fields complete</div>
           </div>
         </div>
       </div>
@@ -132,32 +127,6 @@ export const ProfileReadinessCard: React.FC<ProfileReadinessCardProps> = ({
         ))}
       </div>
 
-      {/* Quick shortcuts / testing helper buttons */}
-      {(onLoadDemoProfile || onResetBaseline) && (
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100 text-xs">
-          <span className="text-[11px] text-slate-400 font-medium">Testing & Demo Helpers:</span>
-          <div className="flex items-center gap-2">
-            {onLoadDemoProfile && (
-              <button
-                type="button"
-                onClick={onLoadDemoProfile}
-                className="px-2.5 py-1 text-[11px] font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md border border-blue-200 transition cursor-pointer"
-              >
-                Populate Full CSE-IoT Profile
-              </button>
-            )}
-            {onResetBaseline && (
-              <button
-                type="button"
-                onClick={onResetBaseline}
-                className="px-2.5 py-1 text-[11px] font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-md transition cursor-pointer"
-              >
-                Reset to ERP Baseline
-              </button>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

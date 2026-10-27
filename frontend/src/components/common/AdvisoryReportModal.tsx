@@ -95,7 +95,9 @@ export const AdvisoryReportModal: React.FC<AdvisoryReportModalProps> = ({
             </div>
             <div>
               <span className="text-slate-500 block text-[11px]">Cumulative GPA</span>
-              <span className="font-mono font-bold text-emerald-700 text-sm">{student.cgpa.toFixed(2)} / 10.0</span>
+              <span className="font-mono font-bold text-emerald-700 text-sm">
+                {student.cgpa === null ? 'Not available' : `${student.cgpa.toFixed(2)} / 10.0`}
+              </span>
             </div>
           </div>
 
@@ -110,7 +112,7 @@ export const AdvisoryReportModal: React.FC<AdvisoryReportModalProps> = ({
                   <h3 className="text-lg font-bold text-slate-900 mt-0.5">{topRecommendation.title}</h3>
                 </div>
                 <span className="px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-100 text-emerald-800 border border-emerald-300">
-                  {topRecommendation.matchScore}% Match Confidence
+                  Model score: {topRecommendation.modelScore}/100 (uncalibrated)
                 </span>
               </div>
 
@@ -140,24 +142,20 @@ export const AdvisoryReportModal: React.FC<AdvisoryReportModalProps> = ({
           {explanation && (
             <div className="space-y-3">
               <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                XAI Decision Attribution (TreeSHAP Mathematical Factors)
+                Model-Provided Factors
               </h4>
 
               <div className="space-y-2 text-xs">
                 {explanation.topPositiveFactors.slice(0, 3).map((f) => (
                   <div key={f.featureName} className="flex items-center justify-between p-2 rounded bg-slate-50 border border-slate-100">
                     <span className="font-medium text-slate-800">{f.displayName}</span>
-                    <span className="font-mono text-emerald-700 font-bold">
-                      +{(f.shapValue * 100).toFixed(1)}% (Positive Driver)
-                    </span>
+                    <span className="text-emerald-700 font-bold">Positive signal</span>
                   </div>
                 ))}
                 {explanation.topNegativeFactors.slice(0, 2).map((f) => (
                   <div key={f.featureName} className="flex items-center justify-between p-2 rounded bg-amber-50/60 border border-amber-200">
                     <span className="font-medium text-amber-900">{f.displayName}</span>
-                    <span className="font-mono text-amber-700 font-bold">
-                      {(f.shapValue * 100).toFixed(1)}% (Bridging Gap)
-                    </span>
+                    <span className="text-amber-700 font-bold">Negative signal</span>
                   </div>
                 ))}
               </div>

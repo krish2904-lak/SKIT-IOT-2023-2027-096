@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import type { RecommendationItem, StackExplanation, DashboardTab } from '../types';
 import { TechStackBadge } from '../components/common/TechStackBadge';
-import { ShapWaterfallChart } from '../components/recommendation/ShapWaterfallChart';
 
 interface RecommendationsPageProps {
   recommendations: RecommendationItem[];
   explanation: StackExplanation | null;
   onSelectStackForExplanation: (stackId: string) => void;
-  onSaveToHistory: (stack: RecommendationItem) => Promise<void>;
   onNavigate: (tab: DashboardTab) => void;
 }
 
@@ -15,22 +13,20 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
   recommendations,
   explanation,
   onSelectStackForExplanation,
-  onSaveToHistory,
   onNavigate,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [sortBy, setSortBy] = useState<'MATCH' | 'PREP' | 'RANK'>('MATCH');
-  const [activeStackId, setActiveStackId] = useState<string>(
-    recommendations[0]?.id ?? 'rec-001'
-  );
-  const [savedStackIds, setSavedStackIds] = useState<string[]>([]);
-  const [savedFeedback, setSavedFeedback] = useState<string | null>(null);
+  const [activeStackId, setActiveStackId] = useState<string>(recommendations[0]?.id ?? '');
   const [isCopiedRoadmap, setIsCopiedRoadmap] = useState(false);
-  const [showShapInline, setShowShapInline] = useState(true);
+  const [showExplanationInline, setShowExplanationInline] = useState(true);
   const [activeSubTab, setActiveSubTab] = useState<'DETAILS' | 'ROADMAP'>('DETAILS');
 
   const categories = ['All', 'Full-Stack Web', 'AI / ML', 'IoT'];
+  const selectedStackId = recommendations.some((item) => item.id === activeStackId)
+    ? activeStackId
+    : recommendations[0]?.id ?? '';
 
   const filtered = recommendations
     .filter((r) => {
@@ -47,22 +43,13 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
       return matchCat && matchSearch;
     })
     .sort((a, b) => {
-      if (sortBy === 'MATCH') return b.matchScore - a.matchScore;
+      if (sortBy === 'MATCH') return b.modelScore - a.modelScore;
       if (sortBy === 'PREP') return a.estimatedTimeToLearn.localeCompare(b.estimatedTimeToLearn);
       return a.rank - b.rank;
     });
 
   const currentStack =
-    recommendations.find((r) => r.id === activeStackId) ?? filtered[0] ?? recommendations[0];
-
-  const handleBookmark = async (stack: RecommendationItem) => {
-    if (!savedStackIds.includes(stack.id)) {
-      await onSaveToHistory(stack);
-      setSavedStackIds((prev) => [...prev, stack.id]);
-      setSavedFeedback(`"${stack.title.split('(')[0]}" saved to your Career History!`);
-      setTimeout(() => setSavedFeedback(null), 3000);
-    }
-  };
+    recommendations.find((r) => r.id === selectedStackId) ?? filtered[0] ?? recommendations[0];
 
   const handleCopyRoadmap = () => {
     if (!currentStack || !currentStack.roadmap) return;
@@ -91,7 +78,7 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
             Ranked Tech-Stack Recommendations
           </h2>
           <p className="text-xs text-slate-500">
-            Computed by Random Forest classifier using verified ERP academic metrics + declared skills.
+            Model-generated recommendations based on the profile and trusted academic data available.
           </p>
         </div>
 
@@ -121,7 +108,7 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
             onChange={(e) => setSortBy(e.target.value as any)}
             className="px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
           >
-            <option value="MATCH">Sort: Highest Match</option>
+            <option value="MATCH">Sort: Highest model score</option>
             <option value="RANK">Sort: Default Rank</option>
             <option value="PREP">Sort: Fast Prep Time</option>
           </select>
@@ -158,23 +145,6 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
         </div>
       </div>
 
-      {/* Floating Save Feedback Banner */}
-      {savedFeedback && (
-        <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs px-4 py-2 rounded-xl flex items-center justify-between shadow-xs animate-fade-in">
-          <span className="flex items-center gap-2 font-medium">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            {savedFeedback}
-          </span>
-          <button
-            type="button"
-            onClick={() => onNavigate('history')}
-            className="text-xs text-emerald-700 underline font-semibold hover:text-emerald-900 cursor-pointer"
-          >
-            View History →
-          </button>
-        </div>
-      )}
-
       {/* Main Two-Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Stack Cards List (col-span-5) */}
@@ -189,9 +159,13 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
           </div>
 
           <div className="space-y-3">
+            {filtered.length === 0 && (
+              <div className="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-600">
+                No recommendations are available for these filters. Submit your profile inputs to generate recommendations.
+              </div>
+            )}
             {filtered.map((item) => {
-              const isSelected = item.id === activeStackId;
-              const isSaved = savedStackIds.includes(item.id);
+              const isSelected = item.id === selectedStackId;
 
               return (
                 <div
@@ -208,7 +182,7 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
                       Rank #{item.rank} • {item.category}
                     </span>
                     <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">
-                      {item.matchScore}% Match
+                      Model score: {item.modelScore}/100
                     </span>
                   </div>
 
@@ -219,23 +193,10 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
 
                   <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
                     <span className="text-slate-500">
-                      Prep Time: <strong className="text-slate-700">{item.estimatedTimeToLearn}</strong>
+                      Catalog estimate: <strong className="text-slate-700">{item.estimatedTimeToLearn}</strong>
                     </span>
 
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleBookmark(item);
-                      }}
-                      className={`px-2.5 py-1 rounded text-[11px] font-medium transition cursor-pointer ${
-                        isSaved
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
-                      }`}
-                    >
-                      {isSaved ? '✓ Saved' : '+ Save to History'}
-                    </button>
+                    <span className="text-[11px] text-slate-500">Saved to history automatically</span>
                   </div>
                 </div>
               );
@@ -243,7 +204,7 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
           </div>
         </div>
 
-        {/* Right Column: Stack Detail & Learning Roadmap & SHAP (col-span-7) */}
+        {/* Right Column: Selected Recommendation Details */}
         <div className="lg:col-span-7 space-y-6">
           {currentStack && (
             <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-5">
@@ -255,7 +216,7 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
                   <h3 className="text-xl font-bold text-slate-900 mt-0.5">{currentStack.title}</h3>
                   <p className="text-xs text-slate-500 mt-1">
                     Difficulty: <strong className="text-slate-800">{currentStack.difficulty}</strong> •
-                    Estimated Preparation: <strong className="text-slate-800">{currentStack.estimatedTimeToLearn}</strong>
+                    Catalog estimate: <strong className="text-slate-800">{currentStack.estimatedTimeToLearn}</strong>
                   </p>
                 </div>
 
@@ -287,10 +248,10 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
 
                   <button
                     type="button"
-                    onClick={() => setShowShapInline((prev) => !prev)}
+                    onClick={() => setShowExplanationInline((prev) => !prev)}
                     className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold border border-blue-200 transition cursor-pointer"
                   >
-                    {showShapInline ? 'Hide SHAP' : 'Show SHAP'}
+                    {showExplanationInline ? 'Hide explanation' : 'Show explanation'}
                   </button>
                 </div>
               </div>
@@ -340,7 +301,7 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
                 /* NEW FEATURE: Learning Roadmap View */
                 <div className="space-y-4 pt-1">
                   <div className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center justify-between">
-                    <span>Curriculum & Milestone Execution Pathway</span>
+                    <span>Learning roadmap</span>
                     <div className="flex items-center gap-2">
                       <span className="text-blue-600 font-mono">{currentStack.estimatedTimeToLearn}</span>
                       <button
@@ -365,7 +326,8 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
                   </div>
 
                   <div className="space-y-3">
-                    {(currentStack.roadmap || []).map((step, idx) => (
+                    {currentStack.roadmap && currentStack.roadmap.length > 0
+                      ? currentStack.roadmap.map((step, idx) => (
                       <div
                         key={step.phase}
                         className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2"
@@ -393,7 +355,12 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
                           <strong>Resource:</strong> {step.recommendedResource}
                         </p>
                       </div>
-                    ))}
+                      ))
+                      : (
+                        <p className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs text-slate-600">
+                          No roadmap was returned for this recommendation.
+                        </p>
+                      )}
                   </div>
                 </div>
               )}
@@ -405,28 +372,44 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
                   onClick={() => onNavigate('compare')}
                   className="font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 cursor-pointer"
                 >
-                  ⇄ Compare with #2 Stack →
+                  ⇄ Compare recommendations →
                 </button>
                 <button
                   type="button"
                   onClick={() => onNavigate('history')}
                   className="font-semibold text-blue-600 hover:text-blue-700 cursor-pointer"
                 >
-                  View Saved History →
+                  View Recommendation History →
                 </button>
               </div>
             </div>
           )}
 
-          {/* Embedded SHAP Visual Feature Importance Chart */}
-          {showShapInline && explanation && currentStack && (
-            <ShapWaterfallChart
-              baseConfidence={explanation.baseConfidence}
-              finalScore={currentStack.matchScore}
-              positiveFactors={explanation.topPositiveFactors}
-              negativeFactors={explanation.topNegativeFactors}
-              stackTitle={currentStack.title}
-            />
+          {showExplanationInline && explanation && currentStack && explanation.recommendationId === currentStack.id && (
+            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
+              <div>
+                <h3 className="text-base font-bold text-slate-900">Model-provided explanation</h3>
+                <p className="mt-1 text-xs text-slate-500">
+                  The model score is uncalibrated and is not a probability or confidence estimate.
+                </p>
+                <p className="mt-3 text-sm text-slate-700">{explanation.summaryText}</p>
+              </div>
+              {[...explanation.topPositiveFactors, ...explanation.topNegativeFactors].length > 0 ? (
+                <ul className="space-y-3">
+                  {[...explanation.topPositiveFactors, ...explanation.topNegativeFactors].map((factor) => (
+                    <li key={factor.featureName} className="border-t border-slate-100 pt-3">
+                      <p className="text-sm font-semibold text-slate-900">
+                        {factor.impactDirection === 'POSITIVE' ? 'Positive factor: ' : 'Negative factor: '}
+                        {factor.displayName}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-600">{factor.explanationNote}</p>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-xs text-slate-500">The model did not provide feature-level factors.</p>
+              )}
+            </div>
           )}
         </div>
       </div>

@@ -46,8 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       id: 'erp-profile',
       label: 'ERP Academic Data',
-      sublabel: 'Grades, SGPA & courses',
-      badge: 'Live',
+      sublabel: 'Linked course records',
       icon: (active) => (
         <svg
           className={`w-5 h-5 ${active ? 'text-blue-400' : 'text-slate-400'}`}
@@ -108,8 +107,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       id: 'explanation',
-      label: 'SHAP Insights',
-      sublabel: 'Model feature breakdown',
+      label: 'Model Explanation',
+      sublabel: 'Recommendation factors',
       icon: (active) => (
         <svg
           className={`w-5 h-5 ${active ? 'text-blue-400' : 'text-slate-400'}`}

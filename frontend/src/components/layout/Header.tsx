@@ -4,9 +4,10 @@ import type { DashboardTab } from '../../types';
 interface HeaderProps {
   activeTab: DashboardTab;
   studentName: string;
-  rollNumber: string;
-  branch: string;
-  lastSync: string;
+  rollNumber: string | null;
+  branch: string | null;
+  lastSync: string | null;
+  hasErpRecords: boolean;
   isSyncing: boolean;
   onSyncErp: () => void;
   onToggleMobileNav: () => void;
@@ -20,6 +21,7 @@ export const Header: React.FC<HeaderProps> = ({
   rollNumber,
   branch,
   lastSync,
+  hasErpRecords,
   isSyncing,
   onSyncErp,
   onToggleMobileNav,
@@ -44,12 +46,12 @@ export const Header: React.FC<HeaderProps> = ({
   }, [isCommandOpen]);
 
   const navOptions: Array<{ id: DashboardTab; label: string; desc: string; category: string }> = [
-    { id: 'overview', label: 'Overview Hub', desc: 'Cumulative GPA, model status & top tech stack match', category: 'Pages' },
-    { id: 'erp-profile', label: 'ERP Academic Records', desc: 'Semester 1-5 grades, SGPA trajectory & attendance', category: 'Pages' },
+    { id: 'overview', label: 'Overview Hub', desc: 'Profile, ERP snapshot and recommendation status', category: 'Pages' },
+    { id: 'erp-profile', label: 'ERP Academic Records', desc: 'Coursework from the trusted ERP snapshot', category: 'Pages' },
     { id: 'profile-input', label: 'Skills & Preferences', desc: 'Self-assessed skills, desired roles & resume parsing', category: 'Pages' },
-    { id: 'recommendations', label: 'AI Tech-Stack Recommendations', desc: 'Random Forest rankings, compatibility & roadmaps', category: 'Pages' },
+    { id: 'recommendations', label: 'AI Tech-Stack Recommendations', desc: 'Ranked model scores and learning roadmaps', category: 'Pages' },
     { id: 'compare', label: 'Stack Comparison Matrix', desc: 'Side-by-side trade-offs between top career paths', category: 'Pages' },
-    { id: 'explanation', label: 'SHAP Explainability & Simulator', desc: 'Feature importance breakdown & elective simulation', category: 'Pages' },
+    { id: 'explanation', label: 'Recommendation Explanation', desc: 'Model-provided factors and learning prerequisites', category: 'Pages' },
     { id: 'history', label: 'Saved History', desc: 'Archived model runs and career path iterations', category: 'Pages' },
   ];
 
@@ -64,12 +66,12 @@ export const Header: React.FC<HeaderProps> = ({
       case 'overview':
         return {
           title: 'Student Dashboard Hub',
-          desc: 'Academic summary, model readiness, and primary tech-stack match overview.',
+          desc: 'Profile summary, trusted ERP data and recommendation status.',
         };
       case 'erp-profile':
         return {
           title: 'ERP Academic Records & Performance Trends',
-          desc: 'Verified institutional grades, laboratory marks, attendance, and semester SGPA history.',
+          desc: 'Course and academic details returned from the ERP snapshot.',
         };
       case 'profile-input':
         return {
@@ -79,12 +81,12 @@ export const Header: React.FC<HeaderProps> = ({
       case 'recommendations':
         return {
           title: 'AI Tech-Stack Recommendations & Roadmaps',
-          desc: 'Random Forest model outputs ranked by compatibility score and step-by-step learning roadmaps.',
+          desc: 'Model scores and step-by-step learning roadmaps.',
         };
       case 'explanation':
         return {
-          title: 'SHAP Explainability & Gap Bridge Simulator',
-          desc: 'Mathematical feature contributions (TreeSHAP) and elective suggestions to boost scores.',
+          title: 'Recommendation Explanation',
+          desc: 'Model-provided recommendation factors and learning prerequisites.',
         };
       case 'compare':
         return {
@@ -121,9 +123,9 @@ export const Header: React.FC<HeaderProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">{title}</h1>
-                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  ERP Connected
+                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-50 text-slate-700 border border-slate-200">
+                  <span className={`w-1.5 h-1.5 rounded-full ${hasErpRecords ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                  {hasErpRecords ? 'ERP snapshot linked' : 'ERP not linked'}
                 </span>
               </div>
               <p className="text-xs text-slate-500 hidden sm:block mt-0.5">{desc}</p>
@@ -169,10 +171,10 @@ export const Header: React.FC<HeaderProps> = ({
               />
               <div className="hidden lg:block text-left text-xs">
                 <span className="font-semibold text-slate-800 block leading-tight">
-                  {isSyncing ? 'Syncing ERP...' : 'ERP Synced'}
+                  {isSyncing ? 'Syncing ERP...' : hasErpRecords ? 'ERP linked' : 'ERP unavailable'}
                 </span>
                 <span className="text-[10px] text-slate-500">
-                  {isSyncing ? 'Fetching SKIT records...' : `Last: ${lastSync}`}
+                  {isSyncing ? 'Requesting refresh...' : lastSync ? `Last: ${new Date(lastSync).toLocaleDateString()}` : 'No sync recorded'}
                 </span>
               </div>
 
@@ -202,12 +204,12 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Student Profile Pill */}
             <div className="flex items-center gap-2.5 pl-2 sm:pl-3 border-l border-slate-200">
               <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-semibold text-xs flex items-center justify-center shadow-xs shrink-0 select-none">
-                PB
+                {studentName.split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase()}
               </div>
               <div className="hidden sm:block text-left text-xs">
                 <div className="font-semibold text-slate-800 leading-tight">{studentName}</div>
                 <div className="text-[11px] text-slate-500 font-mono">
-                  {rollNumber} • {branch}
+                  {rollNumber || 'No roll ID'} • {branch || 'No branch'}
                 </div>
               </div>
             </div>
@@ -286,4 +288,3 @@ export const Header: React.FC<HeaderProps> = ({
     </>
   );
 };
-

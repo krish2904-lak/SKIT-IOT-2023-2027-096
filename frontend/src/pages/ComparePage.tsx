@@ -13,8 +13,8 @@ export const ComparePage: React.FC<ComparePageProps> = ({
   onNavigate,
   onSelectStackForExplanation,
 }) => {
-  const [stackAId, setStackAId] = useState<string>(recommendations[0]?.id ?? 'rec-001');
-  const [stackBId, setStackBId] = useState<string>(recommendations[1]?.id ?? 'rec-002');
+  const [stackAId, setStackAId] = useState<string>(recommendations[0]?.id ?? '');
+  const [stackBId, setStackBId] = useState<string>(recommendations[1]?.id ?? '');
 
   const stackA = recommendations.find((r) => r.id === stackAId) ?? recommendations[0];
   const stackB = recommendations.find((r) => r.id === stackBId) ?? recommendations[1];
@@ -31,7 +31,7 @@ export const ComparePage: React.FC<ComparePageProps> = ({
             Side-by-Side Tech-Stack Comparison
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            Compare target technologies, learning duration, and ERP coursework alignment to make an informed choice.
+            Compare uncalibrated model scores, technologies, catalog duration estimates, and target roles.
           </p>
         </div>
 
@@ -59,7 +59,7 @@ export const ComparePage: React.FC<ComparePageProps> = ({
           >
             {recommendations.map((r) => (
               <option key={r.id} value={r.id}>
-                #{r.rank} {r.title} ({r.matchScore}% Match)
+                #{r.rank} {r.title} (model score {r.modelScore}/100)
               </option>
             ))}
           </select>
@@ -76,7 +76,7 @@ export const ComparePage: React.FC<ComparePageProps> = ({
           >
             {recommendations.map((r) => (
               <option key={r.id} value={r.id} disabled={r.id === stackAId}>
-                #{r.rank} {r.title} ({r.matchScore}% Match)
+                #{r.rank} {r.title} (model score {r.modelScore}/100)
               </option>
             ))}
           </select>
@@ -93,7 +93,7 @@ export const ComparePage: React.FC<ComparePageProps> = ({
                 Option A (Rank #{stackA.rank})
               </span>
               <span className="px-3 py-1 rounded-full text-xs font-bold font-mono bg-blue-50 text-blue-700 border border-blue-200">
-                {stackA.matchScore}% Compatibility
+                Model score: {stackA.modelScore}/100
               </span>
             </div>
 
@@ -108,7 +108,7 @@ export const ComparePage: React.FC<ComparePageProps> = ({
                 <span className="font-bold text-slate-800">{stackA.difficulty}</span>
               </div>
               <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                <span className="text-slate-400 block text-[11px]">Preparation Time</span>
+                <span className="text-slate-400 block text-[11px]">Catalog estimate</span>
                 <span className="font-bold text-slate-800 font-mono">{stackA.estimatedTimeToLearn}</span>
               </div>
             </div>
@@ -143,10 +143,13 @@ export const ComparePage: React.FC<ComparePageProps> = ({
 
             <button
               type="button"
-              onClick={() => onSelectStackForExplanation(stackA.id)}
+              onClick={() => {
+                onSelectStackForExplanation(stackA.id);
+                onNavigate('explanation');
+              }}
               className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition cursor-pointer"
             >
-              Inspect Option A SHAP Factors →
+              Inspect Option A explanation →
             </button>
           </div>
 
@@ -157,7 +160,7 @@ export const ComparePage: React.FC<ComparePageProps> = ({
                 Option B (Rank #{stackB.rank})
               </span>
               <span className="px-3 py-1 rounded-full text-xs font-bold font-mono bg-indigo-50 text-indigo-700 border border-indigo-200">
-                {stackB.matchScore}% Compatibility
+                Model score: {stackB.modelScore}/100
               </span>
             </div>
 
@@ -172,7 +175,7 @@ export const ComparePage: React.FC<ComparePageProps> = ({
                 <span className="font-bold text-slate-800">{stackB.difficulty}</span>
               </div>
               <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                <span className="text-slate-400 block text-[11px]">Preparation Time</span>
+                <span className="text-slate-400 block text-[11px]">Catalog estimate</span>
                 <span className="font-bold text-slate-800 font-mono">{stackB.estimatedTimeToLearn}</span>
               </div>
             </div>
@@ -207,10 +210,13 @@ export const ComparePage: React.FC<ComparePageProps> = ({
 
             <button
               type="button"
-              onClick={() => onSelectStackForExplanation(stackB.id)}
+              onClick={() => {
+                onSelectStackForExplanation(stackB.id);
+                onNavigate('explanation');
+              }}
               className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold transition cursor-pointer"
             >
-              Inspect Option B SHAP Factors →
+              Inspect Option B explanation →
             </button>
           </div>
         </div>

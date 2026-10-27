@@ -29,33 +29,6 @@ export const WorkloadCommitmentCollector: React.FC<WorkloadCommitmentCollectorPr
   onChangeLearningPace,
   error,
 }) => {
-  const getPaceDescription = () => {
-    if (weeklyHours <= 10) {
-      return {
-        tier: 'Part-Time Exploratory',
-        description: 'Ideal for semester exam periods. Focuses on core theory and lightweight weekly mini-labs.',
-        badgeColor: 'bg-amber-100 text-amber-800',
-        roadmapWeeks: '14–16 Weeks',
-      };
-    }
-    if (weeklyHours <= 20) {
-      return {
-        tier: 'Recommended University Track',
-        description: 'Balanced with ongoing college lectures and practicals. Fits standard 3-phase roadmaps.',
-        badgeColor: 'bg-blue-100 text-blue-800',
-        roadmapWeeks: '8–10 Weeks',
-      };
-    }
-    return {
-      tier: 'Intensive Capstone Bootcamp',
-      description: 'Rapid sprint mode. Best suited for summer terms, pre-placement preparation, or hackathon sprints.',
-      badgeColor: 'bg-emerald-100 text-emerald-800',
-      roadmapWeeks: '4–6 Weeks',
-    };
-  };
-
-  const paceInfo = getPaceDescription();
-
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-6">
       {/* Header */}
@@ -69,12 +42,12 @@ export const WorkloadCommitmentCollector: React.FC<WorkloadCommitmentCollectorPr
               Career Target & Dedicated Study Commitment
             </h3>
             <span className="text-[10px] font-semibold uppercase tracking-wider bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
-              Pacing Vector
+              Saved Preference
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Specify your desired job profile and weekly available hours. The platform adjusts learning roadmap
-            phases and difficulty filtering accordingly.
+            These preferences are saved to your profile. The current model does not use them to filter stacks
+            or adjust roadmap durations.
           </p>
         </div>
       </div>
@@ -135,7 +108,7 @@ export const WorkloadCommitmentCollector: React.FC<WorkloadCommitmentCollectorPr
 
           <input
             type="range"
-            min={5}
+            min={1}
             max={40}
             step={5}
             value={weeklyHours}
@@ -144,25 +117,14 @@ export const WorkloadCommitmentCollector: React.FC<WorkloadCommitmentCollectorPr
           />
 
           <div className="flex justify-between text-[10px] text-slate-400 font-mono">
-            <span>5 hrs (Min)</span>
-            <span>20 hrs (Recommended)</span>
+            <span>1 hr (Min)</span>
+            <span>20 hrs</span>
             <span>40 hrs (Max)</span>
           </div>
 
-          {/* Dynamic feedback pill */}
-          <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-1">
-            <div className="flex items-center justify-between">
-              <span className={`text-[10px] font-bold px-2 py-0.2 rounded font-mono ${paceInfo.badgeColor}`}>
-                {paceInfo.tier}
-              </span>
-              <span className="text-[11px] font-mono font-semibold text-slate-700">
-                Est. Completion: {paceInfo.roadmapWeeks}
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-600 leading-relaxed">
-              {paceInfo.description}
-            </p>
-          </div>
+          <p className="text-[11px] text-slate-500">
+            Saved as a profile preference; it does not currently change model output or roadmap estimates.
+          </p>
         </div>
 
         {/* Learning Pace Strategy */}
@@ -176,17 +138,17 @@ export const WorkloadCommitmentCollector: React.FC<WorkloadCommitmentCollectorPr
               {
                 id: 'Balanced',
                 title: 'Balanced Cadence (Recommended)',
-                desc: 'Structured weekly milestones with weekend capstone sprints. Aligns with semester coursework.',
+                desc: 'A saved preference for a steady study rhythm.',
               },
               {
                 id: 'Intensive',
                 title: 'Intensive Sprint',
-                desc: 'Accelerated pacing with high-frequency project deliverables for immediate placement prep.',
+                desc: 'A saved preference for faster-paced learning.',
               },
               {
                 id: 'Self-Paced',
                 title: 'Self-Paced Exploration',
-                desc: 'Flexible timeline without strict weekly deadlines. Great for concurrent exam schedules.',
+                desc: 'A saved preference without a fixed weekly cadence.',
               },
             ].map((p) => {
               const isSelected = learningPace === p.id;

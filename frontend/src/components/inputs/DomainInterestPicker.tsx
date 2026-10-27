@@ -105,7 +105,7 @@ export const DomainInterestPicker: React.FC<DomainInterestPickerProps> = ({
           </div>
           <p className="text-xs text-slate-500 mt-1">
             Choose domains you wish to pursue for capstone projects, internships, or placements.
-            These form primary positive drivers in the Random Forest classification.
+            These preferences are sent as part of your recommendation request.
           </p>
         </div>
 

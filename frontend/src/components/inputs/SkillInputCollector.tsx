@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import type { StudentSkill, SkillLevel, SkillSource } from '../../types';
+import type { StudentSkill, SkillLevel } from '../../types';
 import { CANONICAL_SKILLS_TAXONOMY } from './taxonomy';
 
 // Mapping from interest domains to recommended starter skills
@@ -32,9 +32,7 @@ export const SkillInputCollector: React.FC<SkillInputCollectorProps> = ({
 }) => {
   const [query, setQuery] = useState('');
   const [selectedLevel, setSelectedLevel] = useState<SkillLevel>('Intermediate');
-  const [selectedSource, setSelectedSource] = useState<SkillSource>('SELF_REPORTED');
   const [isOpenSuggestions, setIsOpenSuggestions] = useState(false);
-  const [sourceFilter, setSourceFilter] = useState<'ALL' | SkillSource>('ALL');
   const [searchSkillsList, setSearchSkillsList] = useState('');
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -92,7 +90,7 @@ export const SkillInputCollector: React.FC<SkillInputCollectorProps> = ({
     onAddSkill({
       name,
       level: selectedLevel,
-      source: selectedSource,
+      source: 'SELF_REPORTED',
     });
     setQuery('');
     setIsOpenSuggestions(false);
@@ -111,7 +109,7 @@ export const SkillInputCollector: React.FC<SkillInputCollectorProps> = ({
     onAddSkill({
       name: trimmed,
       level: selectedLevel,
-      source: selectedSource,
+      source: 'SELF_REPORTED',
     });
     setQuery('');
     setIsOpenSuggestions(false);
@@ -120,11 +118,10 @@ export const SkillInputCollector: React.FC<SkillInputCollectorProps> = ({
   // Filtered skills list
   const filteredSkills = useMemo(() => {
     return skills.filter((s) => {
-      const matchesSource = sourceFilter === 'ALL' || s.source === sourceFilter;
       const matchesSearch = s.name.toLowerCase().includes(searchSkillsList.toLowerCase());
-      return matchesSource && matchesSearch;
+      return matchesSearch;
     });
-  }, [skills, sourceFilter, searchSkillsList]);
+  }, [skills, searchSkillsList]);
 
   // Stats calculation
   const stats = useMemo(() => {
@@ -132,9 +129,6 @@ export const SkillInputCollector: React.FC<SkillInputCollectorProps> = ({
       advanced: skills.filter((s) => s.level === 'Advanced').length,
       intermediate: skills.filter((s) => s.level === 'Intermediate').length,
       beginner: skills.filter((s) => s.level === 'Beginner').length,
-      erp: skills.filter((s) => s.source === 'ERP_COURSEWORK').length,
-      resume: skills.filter((s) => s.source === 'RESUME_PARSED').length,
-      self: skills.filter((s) => s.source === 'SELF_REPORTED').length,
     };
   }, [skills]);
 
@@ -155,8 +149,7 @@ export const SkillInputCollector: React.FC<SkillInputCollectorProps> = ({
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Declare technical proficiencies. Pre-verified ERP labs are marked with a verified badge.
-            Rate honestly to ensure tailored recommendations and accurate SHAP attribution.
+            Declare your own technical proficiency levels. Imported ERP and resume skills are shown separately and cannot be relabeled here.
           </p>
         </div>
 
@@ -199,7 +192,7 @@ export const SkillInputCollector: React.FC<SkillInputCollectorProps> = ({
       <form onSubmit={handleManualAdd} className="relative">
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
           {/* Autocomplete input */}
-          <div className="sm:col-span-5 relative">
+          <div className="sm:col-span-6 relative">
             <label className="block text-[11px] font-semibold text-slate-600 mb-1">
               Add Skill Name
             </label>
@@ -258,24 +251,8 @@ export const SkillInputCollector: React.FC<SkillInputCollectorProps> = ({
             </select>
           </div>
 
-          {/* Source selector */}
-          <div className="sm:col-span-2">
-            <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-              Source
-            </label>
-            <select
-              value={selectedSource}
-              onChange={(e) => setSelectedSource(e.target.value as SkillSource)}
-              className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs text-slate-800 focus:outline-blue-500"
-            >
-              <option value="SELF_REPORTED">Self Reported</option>
-              <option value="ERP_COURSEWORK">ERP Lab</option>
-              <option value="RESUME_PARSED">Resume Parsed</option>
-            </select>
-          </div>
-
           {/* Submit button */}
-          <div className="sm:col-span-2 flex items-end">
+          <div className="sm:col-span-3 flex items-end">
             <button
               type="submit"
               disabled={!query.trim()}
@@ -301,28 +278,8 @@ export const SkillInputCollector: React.FC<SkillInputCollectorProps> = ({
 
       {/* Inventory filter tabs & search */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2 border-t border-slate-100">
-        <div className="flex items-center gap-1 overflow-x-auto text-xs">
-          <span className="text-[11px] font-medium text-slate-400 mr-1 shrink-0">Filter:</span>
-          {(['ALL', 'ERP_COURSEWORK', 'RESUME_PARSED', 'SELF_REPORTED'] as const).map((src) => (
-            <button
-              key={src}
-              type="button"
-              onClick={() => setSourceFilter(src)}
-              className={`px-2.5 py-1 text-[11px] font-medium rounded-md transition cursor-pointer shrink-0 ${
-                sourceFilter === src
-                  ? 'bg-slate-900 text-white shadow-2xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              {src === 'ALL'
-                ? `All (${skills.length})`
-                : src === 'ERP_COURSEWORK'
-                ? `ERP Lab (${stats.erp})`
-                : src === 'RESUME_PARSED'
-                ? `Resume (${stats.resume})`
-                : `Self (${stats.self})`}
-            </button>
-          ))}
+        <div className="text-xs text-slate-500">
+          {skills.length} self-reported skills
         </div>
 
         <div className="relative w-full sm:w-48">
@@ -365,16 +322,9 @@ export const SkillInputCollector: React.FC<SkillInputCollectorProps> = ({
                   <span className="text-xs font-bold text-slate-900 truncate">
                     {skill.name}
                   </span>
-                  {skill.source === 'ERP_COURSEWORK' && (
-                    <span className="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.2 rounded font-semibold shrink-0">
-                      ERP Verified
-                    </span>
-                  )}
-                  {skill.source === 'RESUME_PARSED' && (
-                    <span className="text-[9px] bg-purple-50 text-purple-700 border border-purple-200 px-1.5 py-0.2 rounded font-semibold shrink-0">
-                      Resume
-                    </span>
-                  )}
+                  <span className="text-[9px] rounded border border-blue-200 bg-blue-50 px-1.5 py-0.2 font-semibold text-blue-700">
+                    Self-reported
+                  </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-mono">
                   <span>Proficiency:</span>
@@ -450,7 +400,7 @@ export const SkillInputCollector: React.FC<SkillInputCollectorProps> = ({
           </span>
         </div>
         <span className="text-[10px] text-slate-400 font-mono">
-          Vectors normalized to 0.0–1.0 weights
+          Proficiency values are self-reported
         </span>
       </div>
     </div>
