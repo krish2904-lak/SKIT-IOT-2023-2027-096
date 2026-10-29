@@ -24,11 +24,11 @@ export const AdvisoryReportModal: React.FC<AdvisoryReportModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl max-w-3xl w-full shadow-2xl border border-slate-200 overflow-hidden my-8">
+      <div className="bg-white rounded-2xl max-w-3xl w-full shadow-2xl border border-slate-200/80 overflow-hidden my-8">
         {/* Modal Action Bar */}
-        <div className="bg-slate-900 text-white px-6 py-4 flex items-center justify-between print:hidden">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+        <div className="bg-[#0B0F19] text-white px-6 py-4 flex items-center justify-between print:hidden border-b border-slate-800/80">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-300">
               Student Career Advisory Report (Print & Export Preview)
             </span>
@@ -38,7 +38,7 @@ export const AdvisoryReportModal: React.FC<AdvisoryReportModalProps> = ({
             <button
               type="button"
               onClick={handlePrint}
-              className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer btn-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -48,7 +48,8 @@ export const AdvisoryReportModal: React.FC<AdvisoryReportModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="text-slate-400 hover:text-white p-1 text-sm cursor-pointer"
+              className="text-slate-400 hover:text-white p-1.5 rounded-lg text-sm cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
+              aria-label="Close dialog"
             >
               ✕
             </button>
@@ -101,15 +102,15 @@ export const AdvisoryReportModal: React.FC<AdvisoryReportModalProps> = ({
 
           {/* Primary Recommendation Verdict */}
           {topRecommendation && (
-            <div className="border border-blue-200 bg-blue-50/50 rounded-xl p-5 space-y-3">
-              <div className="flex items-center justify-between">
+            <div className="border border-indigo-200/80 bg-gradient-to-br from-indigo-50/60 to-blue-50/30 rounded-2xl p-5 space-y-3 shadow-2xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <span className="text-[10px] font-bold text-blue-700 uppercase tracking-wider">
+                  <span className="text-[10px] font-bold text-indigo-700 uppercase tracking-wider">
                     Primary Recommended Career Stack (Random Forest Output)
                   </span>
-                  <h3 className="text-lg font-bold text-slate-900 mt-0.5">{topRecommendation.title}</h3>
+                  <h3 className="text-lg font-bold text-slate-900 mt-0.5 tracking-tight">{topRecommendation.title}</h3>
                 </div>
-                <span className="px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-100 text-emerald-800 border border-emerald-300">
+                <span className="px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs self-start sm:self-auto">
                   {topRecommendation.matchScore}% Match Confidence
                 </span>
               </div>
@@ -119,16 +120,16 @@ export const AdvisoryReportModal: React.FC<AdvisoryReportModalProps> = ({
               </p>
 
               <div>
-                <span className="text-[11px] font-semibold text-slate-600 block mb-1">
+                <span className="text-[11px] font-semibold text-slate-700 block mb-1.5">
                   Core Technologies to Master:
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {topRecommendation.technologies.map((t) => (
                     <span
                       key={t.name}
-                      className="px-2 py-0.5 rounded text-[11px] font-medium bg-white border border-slate-300 text-slate-800"
+                      className="px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-white border border-slate-300 text-slate-800 shadow-2xs font-mono"
                     >
-                      {t.name} ({t.category})
+                      {t.name} <span className="text-slate-400">({t.category})</span>
                     </span>
                   ))}
                 </div>

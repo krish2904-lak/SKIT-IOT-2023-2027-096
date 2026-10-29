@@ -80,22 +80,22 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 sm:space-y-8">
       {/* Top Filter and Info Bar */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 card-hover-lift">
         <div>
-          <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">
+          <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">
             Machine Learning Inference
           </span>
-          <h2 className="text-base font-bold text-slate-900 mt-0.5">
+          <h2 className="text-base sm:text-lg font-extrabold text-slate-900 mt-0.5 tracking-tight">
             Ranked Tech-Stack Recommendations
           </h2>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 mt-0.5 font-normal leading-normal">
             Computed by Random Forest classifier using verified ERP academic metrics + declared skills.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           {/* Live Search input */}
           <div className="relative">
             <input
@@ -103,10 +103,10 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
               placeholder="Search tech, stack, or role..."
-              className="pl-7 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 w-44 sm:w-52 transition"
+              className="pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-44 sm:w-56 transition-all duration-150"
             />
             <svg
-              className="w-3.5 h-3.5 text-slate-400 absolute left-2 top-2"
+              className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -119,7 +119,7 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+            className="px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer transition"
           >
             <option value="MATCH">Sort: Highest Match</option>
             <option value="RANK">Sort: Default Rank</option>
@@ -130,25 +130,25 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
           <button
             type="button"
             onClick={() => onNavigate('compare')}
-            className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+            className="btn-interactive px-3.5 py-1.5 bg-[#0B0F19] hover:bg-slate-800 text-white rounded-xl text-xs font-semibold shadow-xs transition flex items-center gap-1.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
           >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
             </svg>
             Compare Matrix
           </button>
 
           {/* Category Filters */}
-          <div className="flex flex-wrap items-center gap-1 bg-slate-100 p-0.5 rounded-lg">
+          <div className="flex flex-wrap items-center gap-1 bg-slate-100/80 p-1 rounded-xl border border-slate-200/60">
             {categories.map((cat) => (
               <button
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-2.5 py-1 text-xs font-medium rounded-md transition cursor-pointer ${
+                className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                   selectedCategory === cat
-                    ? 'bg-white text-slate-900 shadow-2xs font-semibold'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white text-indigo-700 shadow-2xs font-bold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                 }`}
               >
                 {cat}
@@ -160,15 +160,15 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
 
       {/* Floating Save Feedback Banner */}
       {savedFeedback && (
-        <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs px-4 py-2 rounded-xl flex items-center justify-between shadow-xs animate-fade-in">
-          <span className="flex items-center gap-2 font-medium">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+        <div className="bg-emerald-50/90 border border-emerald-300 text-emerald-800 text-xs px-4 py-3 rounded-2xl flex items-center justify-between shadow-xs animate-fade-in">
+          <span className="flex items-center gap-2.5 font-medium">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             {savedFeedback}
           </span>
           <button
             type="button"
             onClick={() => onNavigate('history')}
-            className="text-xs text-emerald-700 underline font-semibold hover:text-emerald-900 cursor-pointer"
+            className="text-xs text-emerald-700 font-bold hover:text-emerald-900 cursor-pointer underline underline-offset-2"
           >
             View History →
           </button>
@@ -179,16 +179,16 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Stack Cards List (col-span-5) */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <div className="flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-widest px-1">
             <span>{filtered.length} Evaluated Recommendations</span>
             {searchKeyword && (
-              <span className="text-[11px] text-blue-600 lowercase font-normal">
+              <span className="text-[11px] text-indigo-600 lowercase font-normal">
                 filtered by "{searchKeyword}"
               </span>
             )}
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3.5">
             {filtered.map((item) => {
               const isSelected = item.id === activeStackId;
               const isSaved = savedStackIds.includes(item.id);
@@ -197,29 +197,29 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
                 <div
                   key={item.id}
                   onClick={() => handleSelectStack(item)}
-                  className={`p-5 rounded-xl border transition-all cursor-pointer ${
+                  className={`p-5 rounded-2xl border transition-all duration-200 cursor-pointer card-hover-lift ${
                     isSelected
-                      ? 'border-blue-600 bg-white shadow-sm ring-1 ring-blue-600'
-                      : 'border-slate-200 bg-white hover:border-slate-300 shadow-xs'
+                      ? 'border-indigo-600 bg-white shadow-md ring-2 ring-indigo-500/20'
+                      : 'border-slate-200/90 bg-white hover:border-slate-300 shadow-xs'
                   }`}
                 >
                   <div className="flex items-center justify-between pb-2">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                       Rank #{item.rank} • {item.category}
                     </span>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
                       {item.matchScore}% Match
                     </span>
                   </div>
 
-                  <h3 className="text-sm font-bold text-slate-900 mb-1.5">{item.title}</h3>
-                  <p className="text-xs text-slate-500 line-clamp-2 mb-3">
+                  <h3 className="text-sm font-bold text-slate-900 mb-1.5 tracking-tight">{item.title}</h3>
+                  <p className="text-xs text-slate-500 line-clamp-2 mb-3 leading-relaxed">
                     {item.whyRecommendedSnippet}
                   </p>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                  <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 text-xs">
                     <span className="text-slate-500">
-                      Prep Time: <strong className="text-slate-700">{item.estimatedTimeToLearn}</strong>
+                      Prep Time: <strong className="text-slate-800 font-semibold">{item.estimatedTimeToLearn}</strong>
                     </span>
 
                     <button
@@ -228,10 +228,10 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
                         e.stopPropagation();
                         handleBookmark(item);
                       }}
-                      className={`px-2.5 py-1 rounded text-[11px] font-medium transition cursor-pointer ${
+                      className={`btn-interactive px-3 py-1 rounded-lg text-[11px] font-semibold transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                         isSaved
                           ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                          : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700'
                       }`}
                     >
                       {isSaved ? '✓ Saved' : '+ Save to History'}
@@ -246,28 +246,28 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
         {/* Right Column: Stack Detail & Learning Roadmap & SHAP (col-span-7) */}
         <div className="lg:col-span-7 space-y-6">
           {currentStack && (
-            <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-5">
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-xs card-hover-lift space-y-5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
                 <div>
-                  <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">
+                  <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">
                     Selected Technical Stack
                   </span>
-                  <h3 className="text-xl font-bold text-slate-900 mt-0.5">{currentStack.title}</h3>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Difficulty: <strong className="text-slate-800">{currentStack.difficulty}</strong> •
-                    Estimated Preparation: <strong className="text-slate-800">{currentStack.estimatedTimeToLearn}</strong>
+                  <h3 className="text-xl font-extrabold text-slate-900 mt-0.5 tracking-tight">{currentStack.title}</h3>
+                  <p className="text-xs text-slate-500 mt-1 font-normal">
+                    Difficulty: <strong className="text-slate-800 font-semibold">{currentStack.difficulty}</strong> •
+                    Estimated Preparation: <strong className="text-slate-800 font-semibold">{currentStack.estimatedTimeToLearn}</strong>
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <div className="bg-slate-100 p-1 rounded-lg flex items-center text-xs">
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="bg-slate-100/90 p-1 rounded-xl flex items-center text-xs border border-slate-200/60">
                     <button
                       type="button"
                       onClick={() => setActiveSubTab('DETAILS')}
-                      className={`px-3 py-1 rounded-md font-medium transition cursor-pointer ${
+                      className={`px-3 py-1 rounded-lg font-semibold transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                         activeSubTab === 'DETAILS'
-                          ? 'bg-white text-slate-900 shadow-xs font-semibold'
-                          : 'text-slate-600'
+                          ? 'bg-white text-indigo-700 shadow-xs font-bold'
+                          : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
                       Stack Details
@@ -275,10 +275,10 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
                     <button
                       type="button"
                       onClick={() => setActiveSubTab('ROADMAP')}
-                      className={`px-3 py-1 rounded-md font-medium transition cursor-pointer ${
+                      className={`px-3 py-1 rounded-lg font-semibold transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                         activeSubTab === 'ROADMAP'
-                          ? 'bg-white text-slate-900 shadow-xs font-semibold'
-                          : 'text-slate-600'
+                          ? 'bg-white text-indigo-700 shadow-xs font-bold'
+                          : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
                       Learning Roadmap
@@ -288,7 +288,7 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowShapInline((prev) => !prev)}
-                    className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold border border-blue-200 transition cursor-pointer"
+                    className="btn-interactive px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-semibold border border-indigo-200 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                   >
                     {showShapInline ? 'Hide SHAP' : 'Show SHAP'}
                   </button>
@@ -299,14 +299,14 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
                 <>
                   {/* Target Industry Roles */}
                   <div>
-                    <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
                       Target Industry Roles:
                     </span>
                     <div className="flex flex-wrap gap-1.5">
                       {currentStack.targetRoles.map((role) => (
                         <span
                           key={role}
-                          className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md text-xs font-medium border border-slate-200"
+                          className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold border border-slate-200/80"
                         >
                           {role}
                         </span>
@@ -316,7 +316,7 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
 
                   {/* Technologies Included */}
                   <div>
-                    <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-2">
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
                       Core Technologies & Tools:
                     </span>
                     <div className="flex flex-wrap gap-2">
@@ -327,26 +327,26 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
                   </div>
 
                   {/* AI Recommendation Context */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs text-slate-700">
-                    <span className="font-semibold text-slate-900 block mb-1">
+                  <div className="bg-slate-50/80 border border-slate-200/90 rounded-2xl p-4.5 text-xs text-slate-700">
+                    <span className="font-bold text-slate-900 block mb-1 tracking-tight">
                       Why this stack was prioritized:
                     </span>
-                    <p className="leading-relaxed text-slate-600">
+                    <p className="leading-relaxed text-slate-600 font-normal">
                       {currentStack.whyRecommendedSnippet}
                     </p>
                   </div>
                 </>
               ) : (
-                /* NEW FEATURE: Learning Roadmap View */
+                /* Learning Roadmap View */
                 <div className="space-y-4 pt-1">
-                  <div className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center justify-between">
+                  <div className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
                     <span>Curriculum & Milestone Execution Pathway</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-blue-600 font-mono">{currentStack.estimatedTimeToLearn}</span>
+                      <span className="text-indigo-600 font-mono font-semibold">{currentStack.estimatedTimeToLearn}</span>
                       <button
                         type="button"
                         onClick={handleCopyRoadmap}
-                        className="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 rounded-md border border-slate-200 text-[11px] font-medium transition cursor-pointer flex items-center gap-1 shadow-2xs"
+                        className="btn-interactive px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 rounded-lg border border-slate-200 text-[11px] font-semibold transition cursor-pointer flex items-center gap-1 shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                       >
                         {isCopiedRoadmap ? (
                           <>
@@ -368,29 +368,29 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
                     {(currentStack.roadmap || []).map((step, idx) => (
                       <div
                         key={step.phase}
-                        className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2"
+                        className="p-4 rounded-xl border border-slate-200/90 bg-slate-50/70 space-y-2 card-hover-lift"
                       >
                         <div className="flex items-center justify-between text-xs">
-                          <span className="font-bold text-blue-700">
+                          <span className="font-bold text-indigo-700">
                             Step {idx + 1}: {step.phase}
                           </span>
-                          <span className="px-2 py-0.5 rounded font-mono font-medium bg-blue-100 text-blue-800 text-[11px]">
+                          <span className="px-2.5 py-0.5 rounded-full font-mono font-semibold bg-indigo-100 text-indigo-800 text-[11px]">
                             {step.duration}
                           </span>
                         </div>
-                        <h4 className="text-sm font-bold text-slate-900">{step.title}</h4>
+                        <h4 className="text-sm font-bold text-slate-900 tracking-tight">{step.title}</h4>
                         <div className="flex flex-wrap gap-1.5 pt-1">
                           {step.topics.map((topic) => (
                             <span
                               key={topic}
-                              className="bg-white border border-slate-200 text-slate-700 px-2 py-0.5 rounded text-[11px]"
+                              className="bg-white border border-slate-200 text-slate-700 px-2 py-0.5 rounded-md text-[11px] font-medium shadow-2xs"
                             >
                               • {topic}
                             </span>
                           ))}
                         </div>
                         <p className="text-[11px] text-slate-500 pt-1">
-                          <strong>Resource:</strong> {step.recommendedResource}
+                          <strong className="text-slate-700">Resource:</strong> {step.recommendedResource}
                         </p>
                       </div>
                     ))}
@@ -399,18 +399,18 @@ export const RecommendationsPage: React.FC<RecommendationsPageProps> = ({
               )}
 
               {/* Action Jumps */}
-              <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
+              <div className="flex items-center justify-between pt-3.5 border-t border-slate-100 text-xs">
                 <button
                   type="button"
                   onClick={() => onNavigate('compare')}
-                  className="font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 cursor-pointer"
+                  className="font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   ⇄ Compare with #2 Stack →
                 </button>
                 <button
                   type="button"
                   onClick={() => onNavigate('history')}
-                  className="font-semibold text-blue-600 hover:text-blue-700 cursor-pointer"
+                  className="font-semibold text-indigo-600 hover:text-indigo-700 cursor-pointer transition-colors"
                 >
                   View Saved History →
                 </button>
