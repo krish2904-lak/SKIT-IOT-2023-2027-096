@@ -55,4 +55,10 @@
   - Guarded recommendation package module imports (`model/recommendation/__init__.py`) to prevent dependency lockups in lightweight CI/CD testing environments.
   - Synchronized and updated Quality Assurance & Testing Framework Specification (`docs/qa-and-testing-framework.md`).
 
-
+### Week 8 (23/10/2026 – 29/10/2026): Resume Ingestion QA, Taxonomy Mapping Invariant Tests, "Manual Wins" Conflict Resolution Verification & Unified Suite Expansion
+- **Activities & Deliverables:**
+  - Authored Resume Ingestion QA test suite (`tests/test_resume_qa.py`) validating in-memory buffer isolation (`io.BytesIO`), zero disk persistence, supported format verification (`.pdf`, `.docx`), corrupted file rejection, 5MB boundary enforcement, and PII safety invariants.
+  - Authored Resume Feature Mapping & Conflict Resolution QA test suite (`tests/test_resume_mapping_qa.py`) verifying canonical 48-feature schema alignment, the "Manual Wins" conflict precedence rule (manual inputs supersede resume extractions; novel skills merge with `source="RESUME_PARSED"`), ERP academic score preservation, and sparse resume fallback resilience.
+  - Expanded unified native zero-dependency QA runner (`tests/run_all_qa_tests.py`) from 6 to 8 test suites and from 27 to 37 total test cases with 100% pass rate in ~3.3 seconds.
+  - Verified end-to-end integration across merged student profiles and recommendation roadmap generation.
+  - Updated Quality Assurance & Testing Framework Specification to Version 1.3.0 (`docs/qa-and-testing-framework.md`).

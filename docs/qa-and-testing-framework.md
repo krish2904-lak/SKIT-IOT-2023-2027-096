@@ -3,8 +3,8 @@
 **Author & QA Lead:** Saloni Jain (Data & Testing)  
 **Project ID:** SKIT/DS/2023-2027/CSE-F-096  
 **Mentor:** Dr. Archika Jain  
-**Current Date:** October 22, 2026  
-**Version:** 1.2.0 — Sprint 3 Week 7 Validation Pass  
+**Current Date:** October 29, 2026  
+**Version:** 1.3.0 — Sprint 3 Week 8 Validation Pass  
 
 ---
 
@@ -17,6 +17,8 @@ This document specifies the Quality Assurance (QA) and testing framework develop
 4. **API Integration Contracts & Edge Cases**: Payload contracts, boundary score behavior, cold-start fallback resilience, and error mapping compliance.
 5. **Explainability & SHAP Attributions**: Schema compliance for feature impacts, positive/negative factor bounds, and prerequisite guidance.
 6. **Structured Learning Roadmaps**: Invariant schema auditing across 3-phase structured roadmaps for all 7 tech stack categories.
+7. **Resume Ingestion & Buffer Isolation QA**: Zero-disk persistence, file format boundaries, corrupted stream rejection, and PII safety invariants.
+8. **Resume Feature Mapping & Conflict Resolution QA**: Canonical taxonomy mapping into 48-dimensional float vectors, "Manual Wins" precedence rules, and verified ERP score preservation.
 
 ---
 
@@ -34,8 +36,10 @@ This document specifies the Quality Assurance (QA) and testing framework develop
 │ test_api_integration_qa.py│ Contracts & Boundaries│ 5 / 5      │
 │ test_explainability_qa.py │ SHAP & Feature XAI  │ 5 / 5        │
 │ test_roadmap_qa.py       │ 3-Phase Roadmaps    │ 3 / 3        │
+│ test_resume_qa.py        │ Ingestion & Safety  │ 5 / 5        │
+│ test_resume_mapping_qa.py│ Mapping & Precedence│ 5 / 5        │
 ├──────────────────────────┼─────────────────────┼──────────────┤
-│ TOTAL                    │ Full Pipeline QA    │ 27 / 27      │
+│ TOTAL                    │ Full Pipeline QA    │ 37 / 37      │
 └──────────────────────────┴─────────────────────┴──────────────┘
 ```
 
@@ -78,14 +82,32 @@ This document specifies the Quality Assurance (QA) and testing framework develop
 - **Phase Schema:** Validates mandatory non-empty fields (`phase`, `duration`, `title`, `topics`, `recommendedResource`).
 - **Topic Granularity:** Guarantees each phase contains $\ge 2$ structured curriculum topics.
 
+### 3.7 Resume Ingestion & Buffer Safety QA (`tests/test_resume_qa.py`)
+- **Zero Disk Persistence:** Asserts all parsing occurs within in-memory buffers (`io.BytesIO`) without temporary disk artifact creation.
+- **File Format & Boundary Validation:** Enforces case-insensitive support for `.pdf` and `.docx`, rejecting unsupported extensions (`.txt`, `.json`, `.exe`) with explicit `ValueError` responses.
+- **Corrupted & Empty Payload Handling:** Guarantees zero-byte files and malformed byte streams raise descriptive parsing exceptions.
+- **File Size Enforcement:** Asserts strict rejection when payload exceeds the 5MB upload boundary.
+- **PII & Trace Safety:** Verifies raw binary data or unhandled document text does not leak into user-facing tracebacks or exception messages.
+
+### 3.8 Resume Feature Mapping & Conflict Resolution QA (`tests/test_resume_mapping_qa.py`)
+- **48-Dimensional Feature Invariant:** Validates mapped resume outputs strictly match the 48-feature canonical schema with bounded values in $[0.0, 1.0]$.
+- **"Manual Wins" Precedence Rule:** Asserts that student self-reported skills strictly override resume-parsed skills on name collision, while novel resume skills merge with `source="RESUME_PARSED"`.
+- **ERP Score Preservation:** Ensures verified institutional marks and CGPA cannot be modified or diluted by resume contents.
+- **Sparse Fallback Invariance:** Confirms empty or non-technical resumes produce safe default feature vectors without NaNs or runtime errors.
+- **Inference Pipeline Compatibility:** Validates merged profiles integrate directly with recommendation ranking and 3-phase roadmap engines.
+
 ---
 
 ## 4. Execution Instructions
 
-To execute all QA test suites:
+To execute all QA test suites natively with zero external dependencies:
 
 ```bash
 python tests/run_all_qa_tests.py
-# or directly via pytest:
+```
+
+Or via pytest (when dev dependencies are installed):
+
+```bash
 pytest tests/test_*_qa.py tests/test_dataset_schema.py -v
 ```
