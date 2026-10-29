@@ -2,14 +2,18 @@ name: Weekly Progress Report Auto-Commit
 
 on:
   schedule:
-    # Runs every Thursday at 11:59 PM IST (which corresponds to 18:29 UTC)
-    # Cron format: min hour day-of-month month day-of-week (4 = Thursday)
-    - cron: '29 18 * * 4'
+    # Every Saturday at 5:00 AM IST (Friday 23:30 UTC)
+    - cron: '30 23 * * 5'
 
-  workflow_dispatch: # Allows manual trigger anytime from the Actions tab
+  workflow_dispatch:
 
 permissions:
   contents: write
+
+# Prevent overlapping runs from pushing simultaneously.
+concurrency:
+  group: weekly-progress-report
+  cancel-in-progress: false
 
 jobs:
   generate-and-commit:
@@ -21,6 +25,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -29,26 +34,58 @@ jobs:
 
       - name: Install PDF & Graph Dependencies
         run: |
-          pip install reportlab matplotlib
+          python -m pip install --upgrade pip
+          python -m pip install reportlab matplotlib
 
       - name: Generate Weekly PDF Report
         run: |
           python generate_report.py weekly
 
       - name: Move PDF to Weekly Reports Directory & Commit to Repository
+        shell: bash
         run: |
+          set -euo pipefail
+
           mkdir -p weekly_reports
 
-          mv *_Weekly_Progress_Report_Form-3_*.pdf weekly_reports/ 2>/dev/null || true
+          # Find generated PDFs in the repository root.
+          shopt -s nullglob
+          reports=( *_Weekly_Progress_Report_Form-3_*.pdf )
 
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add weekly_reports/
-
-          if git diff --staged --quiet; then
-            echo "No new changes or reports to commit."
-          else
-            git commit -m "docs: archive Form-3 weekly progress report [skip ci]"
-            git push
+          # Move matching PDFs into weekly_reports/.
+          if [ ${#reports[@]} -gt 0 ]; then
+            for report in "${reports[@]}"; do
+              mv -- "$report" weekly_reports/
+            done
           fi
+
+          # Verify that a PDF exists in the destination directory.
+          if ! find weekly_reports -maxdepth 1 -type f -name '*.pdf' -print -quit | grep -q .; then
+            echo "ERROR: No PDF found in the repository root or weekly_reports/."
+            echo "Check the output filename and location in generate_report.py."
+            echo "Files in the repository root:"
+            ls -la
+            exit 1
+          fi
+
+          # Configure Git identity.
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Stage reports.
+          git add -f weekly_reports/
+
+          if git diff --cached --quiet; then
+            echo "No new changes or reports to commit."
+            exit 0
+          fi
+
+          # Commit the generated report.
+          git commit -m "docs: archive Form-3 weekly progress report [skip ci]"
+
+          # Synchronize with the latest remote main branch.
+          git fetch origin main
+          git rebase origin/main
+
+          # Push the rebased commit.
+          git push origin HEAD:main
