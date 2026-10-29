@@ -33,7 +33,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex bg-slate-100 text-slate-900 font-sans antialiased">
+    <div className="min-h-screen flex bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-indigo-500 selection:text-white">
       {/* Sidebar Navigation */}
       <Sidebar
         activeTab={activeTab}
@@ -60,21 +60,21 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
         {/* Sync alert banner & floating toast */}
         {syncNotification && (
-          <div className="fixed top-18 right-6 z-50 max-w-md bg-white border border-emerald-300 rounded-xl shadow-xl p-3.5 flex items-start gap-3 animate-fade-in">
-            <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+          <div className="fixed top-4 right-4 sm:top-20 sm:right-6 z-50 max-w-sm sm:max-w-md bg-white/95 backdrop-blur-md border border-emerald-500/30 rounded-2xl shadow-xl p-4 flex items-start gap-3.5 transition-all duration-300 ring-1 ring-emerald-500/20">
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-600 flex items-center justify-center shrink-0">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
             <div className="flex-1 text-xs">
-              <span className="font-bold text-slate-900 block">Institutional ERP Update</span>
+              <span className="font-bold text-slate-900 block tracking-tight">Institutional ERP Update</span>
               <p className="text-slate-600 mt-0.5 leading-relaxed">{syncNotification}</p>
-              <span className="font-mono text-[10px] text-emerald-600 mt-1 inline-block">SKIT College API • Verified</span>
+              <span className="font-mono text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 mt-1.5 inline-block font-medium">SKIT College API • Verified</span>
             </div>
           </div>
         )}
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto overflow-y-auto">
+        <main className="flex-1 p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto overflow-y-auto">
           {children}
         </main>
       </div>

@@ -69,28 +69,28 @@ export const ShapWaterfallChart: React.FC<ShapWaterfallChartProps> = ({
   });
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-3">
+    <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-xs space-y-6 card-hover-lift">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
-            <h3 className="text-base font-bold text-slate-900">
+            <span className="w-2.5 h-2.5 rounded-full bg-indigo-600 animate-pulse" />
+            <h3 className="text-base font-extrabold text-slate-900 tracking-tight">
               SHAP Feature Importance & Attribution
             </h3>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-slate-500 mt-1 font-normal leading-normal">
             TreeSHAP explanation visualizing feature contributions toward{' '}
             <span className="font-semibold text-slate-800">{stackTitle}</span>.
           </p>
         </div>
 
         {/* Prediction Equation Badge with Simulated Score */}
-        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-mono">
+        <div className="flex items-center gap-2 bg-slate-50/80 border border-slate-200/80 px-3 py-1.5 rounded-xl text-xs font-mono shadow-2xs">
           <span className="text-slate-500">Base: {(baseConfidence * 100).toFixed(0)}%</span>
           <span className="text-slate-400">→</span>
-          <span className="text-blue-700 font-bold">{finalScore.toFixed(0)}% Match</span>
+          <span className="text-indigo-700 font-bold">{finalScore.toFixed(0)}% Match</span>
           {bridgedFeatures.length > 0 && (
-            <span className="text-emerald-700 font-bold bg-emerald-100 px-1.5 py-0.5 rounded text-[11px]">
+            <span className="text-emerald-700 font-bold bg-emerald-100/90 px-2 py-0.5 rounded-md text-[11px] shadow-2xs">
               ↑ {simulatedScore}% (Simulated)
             </span>
           )}
@@ -99,7 +99,7 @@ export const ShapWaterfallChart: React.FC<ShapWaterfallChartProps> = ({
 
       {/* Interactive Category Filter Pills */}
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg">
+        <div className="flex items-center gap-1 bg-slate-100/80 p-1 rounded-xl border border-slate-200/60">
           {[
             { id: 'ALL', label: 'All Factors' },
             { id: 'ERP', label: 'ERP Coursework' },
@@ -110,9 +110,9 @@ export const ShapWaterfallChart: React.FC<ShapWaterfallChartProps> = ({
               key={cat.id}
               type="button"
               onClick={() => setFilterCategory(cat.id as any)}
-              className={`px-3 py-1 rounded-md font-medium transition cursor-pointer ${
+              className={`px-3 py-1 rounded-lg font-semibold transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                 filterCategory === cat.id
-                  ? 'bg-white text-slate-900 shadow-xs font-semibold'
+                  ? 'bg-white text-indigo-700 shadow-2xs font-bold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -122,16 +122,16 @@ export const ShapWaterfallChart: React.FC<ShapWaterfallChartProps> = ({
         </div>
 
         <div className="text-[11px] text-slate-500">
-          Showing <strong className="text-slate-800">{filteredPositive.length + filteredNegative.length}</strong> mathematical parameters
+          Showing <strong className="text-slate-800 font-semibold">{filteredPositive.length + filteredNegative.length}</strong> mathematical parameters
         </div>
       </div>
 
       {/* Waterfall / Horizontal Contribution Bars */}
-      <div className="space-y-4 pt-1">
+      <div className="space-y-5 pt-1">
         {/* Positive Factors Section */}
         {filteredPositive.length > 0 && (
           <div>
-            <h4 className="text-xs font-semibold text-emerald-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <h4 className="text-xs font-bold text-emerald-800 uppercase tracking-widest mb-2.5 flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
               Positive Drivers ({filteredPositive.length})
             </h4>
@@ -147,17 +147,17 @@ export const ShapWaterfallChart: React.FC<ShapWaterfallChartProps> = ({
                   <div
                     key={factor.featureName}
                     onMouseEnter={() => setActiveFactor(factor)}
-                    className={`p-3 rounded-lg border transition-all cursor-pointer ${
+                    className={`p-3.5 rounded-xl border transition-all duration-200 cursor-pointer ${
                       activeFactor?.featureName === factor.featureName
                         ? 'border-emerald-500 bg-emerald-50/50 shadow-xs'
                         : 'border-slate-100 hover:border-slate-200 bg-slate-50/60'
                     }`}
                   >
-                    <div className="flex items-center justify-between text-xs mb-1.5">
+                    <div className="flex items-center justify-between text-xs mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-slate-900">{factor.displayName}</span>
+                        <span className="font-bold text-slate-900">{factor.displayName}</span>
                         <span
-                          className={`text-[10px] px-2 py-0.5 rounded font-medium border ${cat.bg}`}
+                          className={`text-[10px] px-2 py-0.5 rounded-md font-semibold border ${cat.bg}`}
                         >
                           {cat.label}
                         </span>
@@ -167,14 +167,14 @@ export const ShapWaterfallChart: React.FC<ShapWaterfallChartProps> = ({
                       </span>
                     </div>
 
-                    <div className="w-full bg-slate-200/80 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-slate-200/70 rounded-full h-2 overflow-hidden">
                       <div
-                        className="bg-emerald-500 h-2 rounded-full transition-all duration-500"
+                        className="bg-gradient-to-r from-emerald-500 to-teal-400 h-2 rounded-full transition-all duration-500"
                         style={{ width: `${widthPercent}%` }}
                       />
                     </div>
 
-                    <p className="text-[11px] text-slate-500 mt-1.5">{factor.explanationNote}</p>
+                    <p className="text-[11px] text-slate-500 mt-2 font-normal leading-normal">{factor.explanationNote}</p>
                   </div>
                 );
               })}
@@ -185,12 +185,12 @@ export const ShapWaterfallChart: React.FC<ShapWaterfallChartProps> = ({
         {/* Negative / Skill Gap Factors Section */}
         {filteredNegative.length > 0 && (
           <div className="pt-2">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="text-xs font-semibold text-amber-800 uppercase tracking-wider flex items-center gap-1.5">
+            <div className="flex items-center justify-between mb-2.5">
+              <h4 className="text-xs font-bold text-amber-800 uppercase tracking-widest flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-amber-500" />
                 Negative Drivers & Skill Gaps ({filteredNegative.length})
               </h4>
-              <span className="text-[11px] text-slate-500">
+              <span className="text-[11px] text-slate-500 font-medium">
                 Click &apos;Simulate Bridge&apos; to view score projection
               </span>
             </div>
@@ -208,16 +208,16 @@ export const ShapWaterfallChart: React.FC<ShapWaterfallChartProps> = ({
                   <div
                     key={factor.featureName}
                     onMouseEnter={() => setActiveFactor(factor)}
-                    className={`p-3.5 rounded-xl border transition-all ${
+                    className={`p-3.5 rounded-xl border transition-all duration-200 ${
                       isBridged
                         ? 'border-emerald-300 bg-emerald-50/40 ring-1 ring-emerald-300'
-                        : 'border-amber-200 bg-amber-50/30'
+                        : 'border-amber-200/80 bg-amber-50/30'
                     }`}
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2 mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-slate-900">{factor.displayName}</span>
-                        <span className={`text-[10px] px-2 py-0.5 rounded font-medium border ${cat.bg}`}>
+                        <span className="font-bold text-slate-900">{factor.displayName}</span>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-md font-semibold border ${cat.bg}`}>
                           {cat.label}
                         </span>
                       </div>
@@ -229,10 +229,10 @@ export const ShapWaterfallChart: React.FC<ShapWaterfallChartProps> = ({
                         <button
                           type="button"
                           onClick={(e) => toggleBridgeGap(factor.featureName, e)}
-                          className={`px-2 py-0.5 rounded text-[11px] font-semibold transition cursor-pointer ${
+                          className={`btn-interactive px-3 py-1 rounded-lg text-[11px] font-semibold transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                             isBridged
-                              ? 'bg-emerald-600 text-white'
-                              : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-xs'
+                              ? 'bg-emerald-600 text-white shadow-2xs'
+                              : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs'
                           }`}
                         >
                           {isBridged ? '✓ Gap Bridged (+Boost)' : '+ Simulate Bridge'}
@@ -240,24 +240,24 @@ export const ShapWaterfallChart: React.FC<ShapWaterfallChartProps> = ({
                       </div>
                     </div>
 
-                    <div className="w-full bg-slate-200/80 rounded-full h-2 overflow-hidden mb-2">
+                    <div className="w-full bg-slate-200/70 rounded-full h-2 overflow-hidden mb-2.5">
                       <div
                         className={`h-2 rounded-full transition-all duration-500 ${
-                          isBridged ? 'bg-emerald-400' : 'bg-amber-500'
+                          isBridged ? 'bg-gradient-to-r from-emerald-500 to-teal-400' : 'bg-gradient-to-r from-amber-500 to-rose-400'
                         }`}
                         style={{ width: `${widthPercent}%` }}
                       />
                     </div>
 
-                    <p className="text-[11px] text-slate-600 mb-2">{factor.explanationNote}</p>
+                    <p className="text-[11px] text-slate-600 mb-2 leading-relaxed">{factor.explanationNote}</p>
 
                     {factor.remedyElective && (
-                      <div className="bg-white/80 border border-amber-200/80 rounded-lg p-2 flex items-center justify-between text-[11px]">
+                      <div className="bg-white/90 border border-amber-200/80 rounded-xl p-2.5 flex items-center justify-between text-[11px] shadow-2xs">
                         <span className="text-slate-700">
-                          <strong>Recommended Remediation:</strong> {factor.remedyElective}
+                          <strong className="text-slate-900 font-semibold">Recommended Remediation:</strong> {factor.remedyElective}
                         </span>
                         {factor.potentialBoost && (
-                          <span className="text-emerald-700 font-mono font-bold shrink-0 ml-2">
+                          <span className="text-emerald-700 font-mono font-bold shrink-0 ml-2 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
                             +{factor.potentialBoost}% Match Boost
                           </span>
                         )}
@@ -272,9 +272,9 @@ export const ShapWaterfallChart: React.FC<ShapWaterfallChartProps> = ({
       </div>
 
       {/* AI Recommendation Summary Box */}
-      <div className="bg-blue-50/60 border border-blue-200 rounded-xl p-4 text-xs text-blue-950">
-        <div className="font-semibold mb-1 flex items-center gap-1.5">
-          <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+      <div className="bg-indigo-50/70 border border-indigo-200/90 rounded-2xl p-4.5 sm:p-5 text-xs text-indigo-950 shadow-2xs">
+        <div className="font-bold mb-1.5 flex items-center gap-2 tracking-tight text-slate-900">
+          <svg className="w-4 h-4 text-indigo-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"
               d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
@@ -283,11 +283,11 @@ export const ShapWaterfallChart: React.FC<ShapWaterfallChartProps> = ({
           </svg>
           Academic Interpretability Verdict:
         </div>
-        <p className="leading-relaxed text-blue-900">
+        <p className="leading-relaxed text-indigo-900 font-normal">
           The Random Forest algorithm heavily rewarded your institutional performance in{' '}
-          <strong>Web Development Lab (Grade A+)</strong> and <strong>Database Systems</strong>.
+          <strong className="font-semibold text-indigo-950">Web Development Lab (Grade A+)</strong> and <strong className="font-semibold text-indigo-950">Database Systems</strong>.
           {bridgedFeatures.length > 0 ? (
-            <span className="block mt-1 text-emerald-800 font-semibold">
+            <span className="block mt-1.5 text-emerald-800 font-semibold bg-emerald-100/60 p-2 rounded-xl border border-emerald-200">
               With your {bridgedFeatures.length} simulated remedial electives completed, your projected compatibility rises to {simulatedScore}%.
             </span>
           ) : (

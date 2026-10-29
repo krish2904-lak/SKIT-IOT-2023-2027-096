@@ -57,22 +57,22 @@ export const WorkloadCommitmentCollector: React.FC<WorkloadCommitmentCollectorPr
   const paceInfo = getPaceDescription();
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-6">
+    <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs space-y-6 transition-all">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="flex items-center justify-center w-6 h-6 rounded-md bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 text-xs font-bold border border-indigo-200/70 shadow-2xs">
               4
             </span>
-            <h3 className="text-sm font-bold text-slate-900">
+            <h3 className="text-sm font-bold text-slate-900 tracking-tight">
               Career Target & Dedicated Study Commitment
             </h3>
-            <span className="text-[10px] font-semibold uppercase tracking-wider bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
-              Pacing Vector
+            <span className="text-[10px] font-semibold uppercase tracking-wider bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-mono">
+              Vector 5 • Pacing
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
             Specify your desired job profile and weekly available hours. The platform adjusts learning roadmap
             phases and difficulty filtering accordingly.
           </p>
@@ -80,16 +80,16 @@ export const WorkloadCommitmentCollector: React.FC<WorkloadCommitmentCollectorPr
       </div>
 
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 flex items-center gap-2">
+        <div className="p-3 bg-red-50/90 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2.5 shadow-2xs">
           <svg className="w-4 h-4 shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
-          <span>{error}</span>
+          <span className="font-medium">{error}</span>
         </div>
       )}
 
       {/* Target Technical Role */}
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         <label className="text-xs font-semibold text-slate-700 block">
           Target Professional Role
         </label>
@@ -98,21 +98,21 @@ export const WorkloadCommitmentCollector: React.FC<WorkloadCommitmentCollectorPr
           value={preferredRole}
           onChange={(e) => onChangeRole(e.target.value)}
           placeholder="e.g. Full-Stack Cloud Engineer, AI/ML Specialist..."
-          className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-blue-500 focus:bg-white transition"
+          className="w-full bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus:bg-white transition-all shadow-2xs"
         />
 
         {/* Quick suggestions pills */}
         <div className="flex flex-wrap items-center gap-1.5 pt-1">
-          <span className="text-[11px] text-slate-400 font-medium mr-1">Quick Suggestions:</span>
+          <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider mr-1">Quick Suggestions:</span>
           {COMMON_ROLE_SUGGESTIONS.map((role) => (
             <button
               key={role}
               type="button"
               onClick={() => onChangeRole(role)}
-              className={`px-2 py-0.5 text-[11px] rounded-md transition cursor-pointer border ${
+              className={`px-2.5 py-1 text-[11px] rounded-lg transition-all cursor-pointer border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 active:scale-95 ${
                 preferredRole === role
-                  ? 'bg-blue-600 text-white border-blue-600 font-medium'
-                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                  ? 'bg-indigo-600 text-white border-indigo-600 font-semibold shadow-2xs'
+                  : 'bg-slate-100/80 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 border-slate-200/70'
               }`}
             >
               {role}
@@ -121,14 +121,14 @@ export const WorkloadCommitmentCollector: React.FC<WorkloadCommitmentCollectorPr
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 border-t border-slate-100">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-3 border-t border-slate-100">
         {/* Weekly Hours Slider */}
-        <div className="space-y-3">
+        <div className="space-y-3.5">
           <div className="flex items-center justify-between">
             <label className="text-xs font-semibold text-slate-700 block">
               Weekly Dedicated Study Hours
             </label>
-            <span className="text-sm font-bold font-mono text-blue-600">
+            <span className="text-sm font-bold font-mono text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-200/60">
               {weeklyHours} hrs / week
             </span>
           </div>
@@ -140,7 +140,7 @@ export const WorkloadCommitmentCollector: React.FC<WorkloadCommitmentCollectorPr
             step={5}
             value={weeklyHours}
             onChange={(e) => onChangeWeeklyHours(Number(e.target.value))}
-            className="w-full accent-blue-600 cursor-pointer"
+            className="w-full accent-indigo-600 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg"
           />
 
           <div className="flex justify-between text-[10px] text-slate-400 font-mono">
@@ -150,9 +150,9 @@ export const WorkloadCommitmentCollector: React.FC<WorkloadCommitmentCollectorPr
           </div>
 
           {/* Dynamic feedback pill */}
-          <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-1">
+          <div className="p-3.5 bg-slate-50/80 rounded-xl border border-slate-200/80 space-y-1.5 shadow-2xs">
             <div className="flex items-center justify-between">
-              <span className={`text-[10px] font-bold px-2 py-0.2 rounded font-mono ${paceInfo.badgeColor}`}>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md font-mono border shadow-2xs ${paceInfo.badgeColor}`}>
                 {paceInfo.tier}
               </span>
               <span className="text-[11px] font-mono font-semibold text-slate-700">
@@ -171,7 +171,7 @@ export const WorkloadCommitmentCollector: React.FC<WorkloadCommitmentCollectorPr
             Learning Pace Strategy
           </label>
 
-          <div className="grid grid-cols-1 gap-2">
+          <div className="grid grid-cols-1 gap-2.5">
             {[
               {
                 id: 'Balanced',
@@ -193,11 +193,19 @@ export const WorkloadCommitmentCollector: React.FC<WorkloadCommitmentCollectorPr
               return (
                 <div
                   key={p.id}
+                  role="button"
+                  tabIndex={0}
                   onClick={() => onChangeLearningPace(p.id as any)}
-                  className={`p-3 rounded-lg border text-left transition cursor-pointer ${
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onChangeLearningPace(p.id as any);
+                    }
+                  }}
+                  className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer card-hover-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                     isSelected
-                      ? 'border-blue-500 bg-blue-50/50 ring-1 ring-blue-500'
-                      : 'border-slate-200 bg-slate-50/50 hover:bg-slate-100/70'
+                      ? 'border-indigo-600/80 bg-gradient-to-br from-indigo-50/70 to-blue-50/30 ring-2 ring-indigo-500/70 shadow-xs'
+                      : 'border-slate-200/80 bg-white hover:border-slate-300 hover:bg-slate-50/60 shadow-2xs'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -206,10 +214,10 @@ export const WorkloadCommitmentCollector: React.FC<WorkloadCommitmentCollectorPr
                       type="radio"
                       checked={isSelected}
                       onChange={() => {}}
-                      className="accent-blue-600"
+                      className="accent-indigo-600"
                     />
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                  <p className="text-[11px] text-slate-500 mt-1 leading-snug">
                     {p.desc}
                   </p>
                 </div>
