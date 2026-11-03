@@ -6,6 +6,7 @@ import type {
   StudentInputFormData,
   StudentProfile,
 } from '../types';
+import { canonicalizeDomainIds } from '../components/inputs/taxonomy';
 
 type ApiEnvelope<T> = {
   success: true;
@@ -179,7 +180,7 @@ function mapProfile(
     semester: erpData?.semester ?? previous?.semester ?? null,
     cgpa: erpData ? erpData.cgpa : previous?.cgpa ?? null,
     academicYear: erpData?.academicYear ?? previous?.academicYear ?? null,
-    interests: profile.interests.map((interest) => interest.domain),
+    interests: canonicalizeDomainIds(profile.interests.map((interest) => interest.domain)),
     skills: [
       ...profile.skills.map((skill) => ({
         name: skill.name,
@@ -309,6 +310,7 @@ export const studentApi = {
   },
 
   async submitInputs(data: StudentInputFormData, previous: StudentProfile): Promise<StudentProfile> {
+    const selectedDomains = canonicalizeDomainIds(data.selectedDomains);
     const response = await request<{ profile: ApiProfile }>('/profile', {
       method: 'PUT',
       body: JSON.stringify({
@@ -320,7 +322,7 @@ export const studentApi = {
           source: 'SELF_REPORTED',
           verificationStatus: 'UNVERIFIED',
         })),
-        interests: data.selectedDomains.map((domain, index) => ({
+        interests: selectedDomains.map((domain, index) => ({
           domain,
           priority: index + 1,
           source: 'STUDENT_SELECTED',
@@ -329,7 +331,7 @@ export const studentApi = {
         certificationsCount: data.certificationsCount ?? previous.certificationsCount ?? 0,
         preferences: {
           preferredCareer: data.preferredRole,
-          preferredDomains: data.selectedDomains,
+          preferredDomains: selectedDomains,
           weeklyStudyHours: data.weeklyCommitmentHours,
           learningPace: data.learningPace.replace('-', '_').toUpperCase(),
         },

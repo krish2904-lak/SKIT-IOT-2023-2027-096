@@ -75,6 +75,27 @@ def test_interest_aliases(preprocessor):
     assert vector[names.index("interest_cybersecurity")] == 0.0
 
 
+def test_all_canonical_interest_ids_generate_their_features(preprocessor):
+    student = {"interests": INTEREST_DOMAINS.copy()}
+    original_interests = student["interests"].copy()
+    names = preprocessor.get_feature_names()
+    vector = preprocessor.transform_single(student)
+
+    for domain in INTEREST_DOMAINS:
+        assert vector[names.index(f"interest_{domain}")] == 1.0
+    assert student["interests"] == original_interests
+
+
+def test_unknown_interest_is_ignored_without_mutating_profile(preprocessor):
+    student = {"interests": ["unknown student domain"]}
+    original_interests = student["interests"].copy()
+    names = preprocessor.get_feature_names()
+    vector = preprocessor.transform_single(student)
+
+    assert all(vector[names.index(f"interest_{domain}")] == 0.0 for domain in INTEREST_DOMAINS)
+    assert student["interests"] == original_interests
+
+
 def test_batch_transformation(preprocessor):
     batch = [
         {"cgpa": 8.0, "interests": ["ai_ml"], "skills": ["python"]},

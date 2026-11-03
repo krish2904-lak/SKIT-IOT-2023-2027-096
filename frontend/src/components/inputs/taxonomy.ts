@@ -9,7 +9,7 @@ export interface DomainMeta {
 
 export const DOMAIN_CATALOG: DomainMeta[] = [
   {
-    id: 'Full-Stack Web Development',
+    id: 'web_development',
     name: 'Full-Stack Web Development',
     category: 'Software & Web',
     description: 'Modern reactive web apps, REST/GraphQL microservices, SSR architecture, and cloud data persistence.',
@@ -17,7 +17,7 @@ export const DOMAIN_CATALOG: DomainMeta[] = [
     accentColor: 'from-blue-500/10 to-indigo-500/10 border-blue-200 text-blue-700',
   },
   {
-    id: 'Applied Artificial Intelligence / Machine Learning',
+    id: 'ai_ml',
     name: 'Applied AI & Machine Learning',
     category: 'Data & AI',
     description: 'Predictive modeling, deep learning architectures, feature engineering, and model explainability (XAI).',
@@ -25,7 +25,7 @@ export const DOMAIN_CATALOG: DomainMeta[] = [
     accentColor: 'from-purple-500/10 to-pink-500/10 border-purple-200 text-purple-700',
   },
   {
-    id: 'Cloud Architecture & DevOps',
+    id: 'cloud_devops',
     name: 'Cloud Architecture & DevOps',
     category: 'Cloud & Systems',
     description: 'Container orchestration, CI/CD pipelines, Infrastructure as Code, serverless, and cloud observability.',
@@ -33,7 +33,7 @@ export const DOMAIN_CATALOG: DomainMeta[] = [
     accentColor: 'from-cyan-500/10 to-blue-500/10 border-cyan-200 text-cyan-700',
   },
   {
-    id: 'Internet of Things (IoT) & Embedded Firmware',
+    id: 'iot_embedded',
     name: 'IoT & Embedded Systems',
     category: 'Hardware & IoT',
     description: 'Microcontroller programming, sensor telemetry, edge computing, MQTT broker pipelines, and IoT security.',
@@ -41,7 +41,7 @@ export const DOMAIN_CATALOG: DomainMeta[] = [
     accentColor: 'from-emerald-500/10 to-teal-500/10 border-emerald-200 text-emerald-700',
   },
   {
-    id: 'Data Engineering & Big Data Systems',
+    id: 'data_analytics',
     name: 'Data Engineering & Big Data',
     category: 'Data & AI',
     description: 'Distributed data pipelines, ETL workflows, data warehousing, stream processing, and analytics modeling.',
@@ -49,7 +49,7 @@ export const DOMAIN_CATALOG: DomainMeta[] = [
     accentColor: 'from-amber-500/10 to-orange-500/10 border-amber-200 text-amber-700',
   },
   {
-    id: 'Cybersecurity & Network Defense',
+    id: 'cybersecurity',
     name: 'Cybersecurity & Defense',
     category: 'Mobile & Security',
     description: 'Network forensics, vulnerability assessment, cryptography protocols, identity management, and threat modeling.',
@@ -57,7 +57,7 @@ export const DOMAIN_CATALOG: DomainMeta[] = [
     accentColor: 'from-rose-500/10 to-red-500/10 border-rose-200 text-rose-700',
   },
   {
-    id: 'Mobile Application Development (Flutter/React Native)',
+    id: 'mobile_dev',
     name: 'Mobile App Development',
     category: 'Mobile & Security',
     description: 'Cross-platform native mobile engineering, state management, mobile offline caching, and responsive device UX.',
@@ -65,6 +65,45 @@ export const DOMAIN_CATALOG: DomainMeta[] = [
     accentColor: 'from-violet-500/10 to-indigo-500/10 border-violet-200 text-violet-700',
   },
 ];
+
+const CANONICAL_DOMAIN_IDS = new Set(DOMAIN_CATALOG.map((domain) => domain.id));
+
+const LEGACY_DOMAIN_ALIASES: Record<string, string> = {
+  'full-stack web development': 'web_development',
+  'web development': 'web_development',
+  'applied artificial intelligence / machine learning': 'ai_ml',
+  'applied ai & machine learning': 'ai_ml',
+  'artificial intelligence': 'ai_ml',
+  'artificial intelligence / machine learning': 'ai_ml',
+  'machine learning': 'ai_ml',
+  ai: 'ai_ml',
+  'cloud architecture & devops': 'cloud_devops',
+  'cloud computing & devops': 'cloud_devops',
+  'cloud computing': 'cloud_devops',
+  'internet of things (iot) & embedded firmware': 'iot_embedded',
+  'iot & embedded systems': 'iot_embedded',
+  'internet of things': 'iot_embedded',
+  'data engineering & big data systems': 'data_analytics',
+  'data engineering & big data': 'data_analytics',
+  'data science': 'data_analytics',
+  'data science & analytics': 'data_analytics',
+  'cybersecurity & network defense': 'cybersecurity',
+  'cybersecurity & defense': 'cybersecurity',
+  'cyber security': 'cybersecurity',
+  'mobile application development (flutter/react native)': 'mobile_dev',
+  'mobile application development': 'mobile_dev',
+  'mobile app development': 'mobile_dev',
+};
+
+export function canonicalizeDomainId(domain: string): string {
+  const normalized = domain.trim().toLowerCase();
+  if (CANONICAL_DOMAIN_IDS.has(normalized)) return normalized;
+  return LEGACY_DOMAIN_ALIASES[normalized] ?? domain;
+}
+
+export function canonicalizeDomainIds(domains: string[]): string[] {
+  return domains.map(canonicalizeDomainId);
+}
 
 // Standardized vocabulary aligned with model/preprocessing/features.py
 export const CANONICAL_SKILLS_TAXONOMY: { name: string; category: string; aliases: string[] }[] = [
