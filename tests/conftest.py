@@ -1,3 +1,14 @@
+import sys
+from pathlib import Path
+
+# Add root and ai-service to sys.path
+ROOT_DIR = Path(__file__).resolve().parent.parent
+AI_SERVICE_DIR = ROOT_DIR / "ai-service"
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+if str(AI_SERVICE_DIR) not in sys.path:
+    sys.path.insert(0, str(AI_SERVICE_DIR))
+
 try:
     import pytest
     fixture = pytest.fixture
