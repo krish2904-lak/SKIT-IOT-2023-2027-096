@@ -32,3 +32,6 @@ class ResumeParseResponse(BaseModel):
     experience_level: str = Field(..., description="Estimated experience level")
     mapped_features: Dict[str, float] = Field(..., description="48-feature mapping dictionary")
     merged_profile: Dict[str, Any] = Field(..., description="Complete profile merged with manual inputs (manual inputs win on conflict)")
+
+
+from model.resume.schemas import ResumeExtractResponse, ResumeTextExtractRequest
