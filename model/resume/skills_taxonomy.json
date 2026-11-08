@@ -1,0 +1,306 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SKIT F-096 Skill and Domain Taxonomy",
+  "version": "1.0.0",
+  "description": "Standardized skill taxonomy mapping aliases, developer colloquialisms, and variations to canonical 48-feature dimensions and target technology stacks.",
+  "skills": [
+    {
+      "canonical": "python",
+      "feature_name": "skill_python",
+      "aliases": ["python", "python3", "py"],
+      "primary_stack": "AI_ML_ENGINEERING",
+      "category": "language"
+    },
+    {
+      "canonical": "javascript",
+      "feature_name": "skill_javascript",
+      "aliases": ["javascript", "js", "es6", "ecmascript"],
+      "primary_stack": "MERN_FULL_STACK",
+      "category": "language"
+    },
+    {
+      "canonical": "typescript",
+      "feature_name": "skill_typescript",
+      "aliases": ["typescript", "ts"],
+      "primary_stack": "MERN_FULL_STACK",
+      "category": "language"
+    },
+    {
+      "canonical": "java",
+      "feature_name": "skill_java",
+      "aliases": ["java", "core java", "j2ee"],
+      "primary_stack": "CLOUD_DEVOPS",
+      "category": "language"
+    },
+    {
+      "canonical": "cpp",
+      "feature_name": "skill_cpp",
+      "aliases": ["cpp", "c++", "c/c++"],
+      "primary_stack": "IOT_EMBEDDED_SYSTEMS",
+      "category": "language"
+    },
+    {
+      "canonical": "c",
+      "feature_name": "skill_c",
+      "aliases": ["c", "embedded c", "ansi c"],
+      "primary_stack": "IOT_EMBEDDED_SYSTEMS",
+      "category": "language"
+    },
+    {
+      "canonical": "sql",
+      "feature_name": "skill_sql",
+      "aliases": ["sql", "rdbms", "relational database", "plsql", "t-sql"],
+      "primary_stack": "DATA_ANALYTICS",
+      "category": "language"
+    },
+    {
+      "canonical": "html_css",
+      "feature_name": "skill_html_css",
+      "aliases": ["html", "css", "html5", "css3", "html/css", "tailwind", "tailwindcss", "bootstrap"],
+      "primary_stack": "MERN_FULL_STACK",
+      "category": "frontend"
+    },
+    {
+      "canonical": "react",
+      "feature_name": "skill_react",
+      "aliases": ["react", "reactjs", "react.js", "react js", "react-native"],
+      "primary_stack": "MERN_FULL_STACK",
+      "category": "framework"
+    },
+    {
+      "canonical": "nodejs",
+      "feature_name": "skill_nodejs",
+      "aliases": ["node", "nodejs", "node.js", "node js"],
+      "primary_stack": "MERN_FULL_STACK",
+      "category": "framework"
+    },
+    {
+      "canonical": "express",
+      "feature_name": "skill_express",
+      "aliases": ["express", "expressjs", "express.js", "express js"],
+      "primary_stack": "MERN_FULL_STACK",
+      "category": "framework"
+    },
+    {
+      "canonical": "fastapi",
+      "feature_name": "skill_fastapi",
+      "aliases": ["fastapi", "fast api"],
+      "primary_stack": "AI_ML_ENGINEERING",
+      "category": "framework"
+    },
+    {
+      "canonical": "django",
+      "feature_name": "skill_django",
+      "aliases": ["django", "django rest framework", "drf"],
+      "primary_stack": "AI_ML_ENGINEERING",
+      "category": "framework"
+    },
+    {
+      "canonical": "flask",
+      "feature_name": "skill_flask",
+      "aliases": ["flask"],
+      "primary_stack": "AI_ML_ENGINEERING",
+      "category": "framework"
+    },
+    {
+      "canonical": "pytorch",
+      "feature_name": "skill_pytorch",
+      "aliases": ["pytorch", "torch"],
+      "primary_stack": "AI_ML_ENGINEERING",
+      "category": "framework"
+    },
+    {
+      "canonical": "tensorflow",
+      "feature_name": "skill_tensorflow",
+      "aliases": ["tensorflow", "tf", "keras"],
+      "primary_stack": "AI_ML_ENGINEERING",
+      "category": "framework"
+    },
+    {
+      "canonical": "scikit_learn",
+      "feature_name": "skill_scikit_learn",
+      "aliases": ["scikit-learn", "sklearn", "scikit learn"],
+      "primary_stack": "DATA_ANALYTICS",
+      "category": "framework"
+    },
+    {
+      "canonical": "flutter",
+      "feature_name": "skill_flutter",
+      "aliases": ["flutter", "dart"],
+      "primary_stack": "MOBILE_APP_DEV",
+      "category": "framework"
+    },
+    {
+      "canonical": "mongodb",
+      "feature_name": "skill_mongodb",
+      "aliases": ["mongodb", "mongo", "nosql"],
+      "primary_stack": "MERN_FULL_STACK",
+      "category": "database"
+    },
+    {
+      "canonical": "postgresql",
+      "feature_name": "skill_postgresql",
+      "aliases": ["postgresql", "postgres", "postgres_db", "psql"],
+      "primary_stack": "DATA_ANALYTICS",
+      "category": "database"
+    },
+    {
+      "canonical": "mysql",
+      "feature_name": "skill_mysql",
+      "aliases": ["mysql", "mariadb"],
+      "primary_stack": "MERN_FULL_STACK",
+      "category": "database"
+    },
+    {
+      "canonical": "influxdb",
+      "feature_name": "skill_influxdb",
+      "aliases": ["influxdb", "influx", "time series db"],
+      "primary_stack": "IOT_EMBEDDED_SYSTEMS",
+      "category": "database"
+    },
+    {
+      "canonical": "docker",
+      "feature_name": "skill_docker",
+      "aliases": ["docker", "containerization", "containers", "dockerfile"],
+      "primary_stack": "CLOUD_DEVOPS",
+      "category": "devops"
+    },
+    {
+      "canonical": "kubernetes",
+      "feature_name": "skill_kubernetes",
+      "aliases": ["kubernetes", "k8s", "k8"],
+      "primary_stack": "CLOUD_DEVOPS",
+      "category": "devops"
+    },
+    {
+      "canonical": "aws",
+      "feature_name": "skill_aws",
+      "aliases": ["aws", "amazon web services", "ec2", "s3", "lambda"],
+      "primary_stack": "CLOUD_DEVOPS",
+      "category": "devops"
+    },
+    {
+      "canonical": "linux",
+      "feature_name": "skill_linux",
+      "aliases": ["linux", "ubuntu", "bash", "shell", "unix"],
+      "primary_stack": "CYBERSECURITY",
+      "category": "devops"
+    },
+    {
+      "canonical": "git",
+      "feature_name": "skill_git",
+      "aliases": ["git", "github", "gitlab", "version control"],
+      "primary_stack": "CLOUD_DEVOPS",
+      "category": "devops"
+    },
+    {
+      "canonical": "arduino",
+      "feature_name": "skill_arduino",
+      "aliases": ["arduino", "arduino uno", "microcontroller"],
+      "primary_stack": "IOT_EMBEDDED_SYSTEMS",
+      "category": "iot"
+    },
+    {
+      "canonical": "esp32",
+      "feature_name": "skill_esp32",
+      "aliases": ["esp32", "esp8266", "esp-32", "nodemcu"],
+      "primary_stack": "IOT_EMBEDDED_SYSTEMS",
+      "category": "iot"
+    },
+    {
+      "canonical": "mqtt",
+      "feature_name": "skill_mqtt",
+      "aliases": ["mqtt", "mosquitto", "iot protocol"],
+      "primary_stack": "IOT_EMBEDDED_SYSTEMS",
+      "category": "iot"
+    },
+    {
+      "canonical": "raspberry_pi",
+      "feature_name": "skill_raspberry_pi",
+      "aliases": ["raspberry_pi", "raspberry pi", "raspi", "rpi"],
+      "primary_stack": "IOT_EMBEDDED_SYSTEMS",
+      "category": "iot"
+    }
+  ],
+  "domains": [
+    {
+      "canonical": "web_development",
+      "feature_name": "interest_web_development",
+      "aliases": ["web dev", "web development", "frontend", "backend", "full stack", "fullstack", "web"],
+      "target_stack": "MERN_FULL_STACK"
+    },
+    {
+      "canonical": "ai_ml",
+      "feature_name": "interest_ai_ml",
+      "aliases": ["ai", "ml", "ai/ml", "machine learning", "artificial intelligence", "deep learning", "nlp", "computer vision"],
+      "target_stack": "AI_ML_ENGINEERING"
+    },
+    {
+      "canonical": "iot_embedded",
+      "feature_name": "interest_iot_embedded",
+      "aliases": ["iot", "internet of things", "embedded systems", "embedded", "sensors", "microcontrollers"],
+      "target_stack": "IOT_EMBEDDED_SYSTEMS"
+    },
+    {
+      "canonical": "cloud_devops",
+      "feature_name": "interest_cloud_devops",
+      "aliases": ["cloud", "devops", "cloud & devops", "ci/cd", "cloud computing", "site reliability"],
+      "target_stack": "CLOUD_DEVOPS"
+    },
+    {
+      "canonical": "mobile_dev",
+      "feature_name": "interest_mobile_dev",
+      "aliases": ["mobile dev", "mobile development", "android", "ios", "app development", "mobile apps"],
+      "target_stack": "MOBILE_APP_DEV"
+    },
+    {
+      "canonical": "data_analytics",
+      "feature_name": "interest_data_analytics",
+      "aliases": ["data analytics", "data science", "data engineering", "big data", "bi", "business intelligence"],
+      "target_stack": "DATA_ANALYTICS"
+    },
+    {
+      "canonical": "cybersecurity",
+      "feature_name": "interest_cybersecurity",
+      "aliases": ["cybersecurity", "cyber security", "network security", "infosec", "ethical hacking", "penetration testing"],
+      "target_stack": "CYBERSECURITY"
+    }
+  ],
+  "academic_course_hints": [
+    {
+      "canonical": "web_technologies",
+      "feature_name": "course_web_technologies",
+      "keywords": ["web technology", "web technologies", "internet programming", "web engineering"]
+    },
+    {
+      "canonical": "dbms",
+      "feature_name": "course_dbms",
+      "keywords": ["database management", "dbms", "relational databases", "database systems"]
+    },
+    {
+      "canonical": "dsa",
+      "feature_name": "course_dsa",
+      "keywords": ["data structures", "algorithms", "dsa", "design and analysis of algorithms"]
+    },
+    {
+      "canonical": "iot_embedded",
+      "feature_name": "course_iot_embedded",
+      "keywords": ["internet of things", "iot", "embedded systems", "microprocessors"]
+    },
+    {
+      "canonical": "ml_math",
+      "feature_name": "course_ml_math",
+      "keywords": ["machine learning", "applied statistics", "discrete mathematics", "probability"]
+    },
+    {
+      "canonical": "cloud_computing",
+      "feature_name": "course_cloud_computing",
+      "keywords": ["cloud computing", "distributed systems", "virtualization"]
+    },
+    {
+      "canonical": "operating_systems",
+      "feature_name": "course_operating_systems",
+      "keywords": ["operating systems", "os", "system programming"]
+    }
+  ]
+}

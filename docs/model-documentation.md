@@ -200,3 +200,30 @@ Comprehensive evaluation tools are provided via `model/training/evaluate.py`:
 - **Hyperparameter Leaderboard:** Benchmarks 5 configurations (`Lightweight`, `Standard`, `Production`, `Deep Ensemble`, `Unbounded Depth`) across execution latency and generalizability.
 - **Metrics Serialization:** Outputs JSON diagnostic reports (`model/saved_models/evaluation_metrics.json`) for auditing and integration testing.
 
+---
+
+## 13. Resume Extraction & Competency Mapping (Sprint 4)
+
+Sprint 4 introduces an automated resume extraction pipeline encapsulated under `model.resume`:
+
+### 13.1 Architecture & Components
+1. **Document Ingestion (`model.resume.parser`):**
+   - Ingests `.pdf`, `.docx`, `.txt`, and pasted string text buffers strictly in-memory.
+   - Enforces a 5 MB maximum file size limit; unsupported media types reject with HTTP 415.
+   - Strict zero-persistence policy: no uploaded resume files or texts are ever written to disk or recorded in application logs.
+2. **Skill Taxonomy (`model/resume/skills_taxonomy.json`):**
+   - Comprehensive canonical mapping covering all 31 technical skills and 7 interest domains.
+   - Resolves aliases and colloquialisms (e.g., `Node.js`, `k8s`, `Python 3`, `ES6`) into canonical feature tokens and target technology stack ecosystems.
+3. **Dual Extractor Engine (`model.resume.extractor`):**
+   - `RuleBasedExtractor`: Default, offline, deterministic extractor identifying technical skills, experience tiers, projects, certifications, and academic CGPA hints using regex and taxonomy matching.
+   - `LLMExtractor`: Optional extractor activated when an API key (e.g. `GEMINI_API_KEY`) is set. Enforces strict JSON via Pydantic; automatically falls back to `RuleBasedExtractor` on network timeout, invalid schema, or parsing failure.
+4. **Feature Mapper & Precedence Rule (`model.resume.mapper`):**
+   - Merges extracted resume competencies with manually declared form inputs.
+   - **The Precedence Rule ("Manual Wins"):** Manually declared student inputs strictly supersede resume extractions; resume extractions only fill missing attributes.
+   - Missing features are defensively imputed using the model training pipeline defaults (CGPA `0.70`, course marks `0.70`, skills/interests `0.0`, projects `0.10`, certs `0.0`).
+   - Computes a granular confidence score $[0.0, 1.0]$ for each of the 48 features.
+5. **REST API Microservice Endpoints (`ai-service`):**
+   - `POST /api/v1/resume/extract`: Ingests resume file or text, returning extracted competencies, 48-feature mapping, and field-level confidences.
+   - `POST /api/v1/recommend/from-resume`: End-to-end ingestion, mapping, profile merging, and Random Forest inference with optional TreeSHAP explanation (`?explain=true`).
+   - Detailed schema and integration examples are documented in `docs/resume-extraction-api-contract.md`.
+

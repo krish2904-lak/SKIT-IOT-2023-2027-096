@@ -156,4 +156,10 @@ class ExplanationRequest(BaseModel):
 
 
 # Re-export Resume schemas
-from .resume.schemas import ExtractedSkill, ResumeExtractionResult, ResumeParseResponse
+from .resume.schemas import (
+    ExtractedSkill,
+    ResumeExtractionResult,
+    ResumeParseResponse,
+    ResumeExtractResponse,
+    ResumeTextExtractRequest,
+)

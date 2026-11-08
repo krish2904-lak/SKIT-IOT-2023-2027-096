@@ -7,8 +7,8 @@ Random Forest recommendations, TreeSHAP explainability, and resume parsing with 
 import json
 import sys
 from pathlib import Path
-from typing import Dict, Any, List, Optional
-from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Form, status
+from typing import Dict, Any, List, Optional, Tuple
+from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Form, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
@@ -23,6 +23,8 @@ from .schemas import (
     StackExplanationResponse,
     ExplanationRequest,
     ResumeParseResponse,
+    ResumeExtractResponse,
+    ResumeTextExtractRequest,
 )
 from model.recommendation.predictor import TechStackPredictor
 from model.recommendation.tech_stacks import TECH_STACK_CATALOG
@@ -32,6 +34,8 @@ from app.resume import (
     LLMResumeExtractor,
     merge_resume_with_manual,
 )
+from model.resume.extractor import RuleBasedExtractor, LLMExtractor
+from model.resume.mapper import ResumeFeatureMapper
 
 
 @asynccontextmanager
@@ -337,3 +341,239 @@ async def parse_student_resume(
         "mapped_features": mapped_features,
         "merged_profile": merged_profile,
     }
+
+
+async def _extract_resume_content(
+    request: Request,
+    file: Optional[UploadFile] = None,
+    text: Optional[str] = None,
+    manual_profile: Optional[str] = None,
+) -> Tuple[str, Optional[Dict[str, Any]]]:
+    """
+    Helper extracting raw text and optional manual profile data across
+    multipart form uploads and JSON request bodies.
+    Validates file formats (415), size bounds (413), and content integrity (422).
+    """
+    content_type = request.headers.get("content-type", "").lower()
+    raw_text: Optional[str] = None
+    manual_data: Optional[Dict[str, Any]] = None
+
+    if "application/json" in content_type:
+        try:
+            body = await request.json()
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Malformed JSON request body: {str(e)}",
+            )
+        if not isinstance(body, dict):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Request body must be a JSON object.",
+            )
+        raw_text = body.get("text")
+        manual_data = body.get("manual_profile")
+        if manual_data is not None and not isinstance(manual_data, dict):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="manual_profile in JSON body must be an object.",
+            )
+    else:
+        if file is not None and file.filename:
+            ext = Path(file.filename).suffix.lower()
+            if ext not in {".pdf", ".docx", ".txt"}:
+                raise HTTPException(
+                    status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+                    detail=f"Unsupported file format '{ext}'. Only .pdf, .docx, and .txt files are accepted.",
+                )
+            try:
+                contents = await file.read()
+            except Exception as e:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=f"Failed to read uploaded file buffer: {str(e)}",
+                )
+            if len(contents) > 5 * 1024 * 1024:
+                raise HTTPException(
+                    status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                    detail="File size exceeds maximum allowed limit of 5 MB.",
+                )
+            if len(contents) == 0:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="Uploaded file is empty (0 bytes).",
+                )
+            try:
+                raw_text = extract_text_from_file(contents, file.filename)
+            except ValueError as val_err:
+                msg = str(val_err)
+                if "exceeds maximum allowed limit" in msg:
+                    raise HTTPException(
+                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                        detail=msg,
+                    )
+                if "Unsupported file format" in msg:
+                    raise HTTPException(
+                        status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+                        detail=msg,
+                    )
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=msg,
+                )
+        elif text:
+            raw_text = text
+
+        if manual_profile:
+            try:
+                manual_data = json.loads(manual_profile)
+            except Exception as e:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=f"Invalid manual_profile JSON: {str(e)}",
+                )
+
+    if not raw_text or not str(raw_text).strip():
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Either a valid non-empty 'file' or 'text' must be provided.",
+        )
+
+    clean_text = str(raw_text).strip()
+    if len(clean_text.encode("utf-8")) > 5 * 1024 * 1024:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="Input resume text exceeds maximum allowed limit of 5 MB.",
+        )
+
+    return clean_text, manual_data
+
+
+@app.post(
+    "/api/v1/resume/extract",
+    response_model=ResumeExtractResponse,
+    status_code=status.HTTP_200_OK,
+    tags=["Resume Extraction"],
+)
+async def extract_resume_competencies(
+    request: Request,
+    file: Optional[UploadFile] = File(None, description="Uploaded resume file (PDF, DOCX, or TXT)"),
+    text: Optional[str] = Form(None, description="Pasted resume raw text"),
+    manual_profile: Optional[str] = Form(None, description="Optional manual student profile JSON string"),
+) -> Dict[str, Any]:
+    """
+    Extracts skills, domains, projects, certifications, and academic hints from a resume (file or text).
+    Maps extracted attributes to the 48-feature schema with field-level confidences.
+    Student manual form entries take precedence over resume values; resume values only fill missing fields.
+    """
+    clean_text, manual_data = await _extract_resume_content(
+        request=request,
+        file=file,
+        text=text,
+        manual_profile=manual_profile,
+    )
+
+    # Extract via LLMExtractor (uses Gemini/external LLM if API key configured, otherwise RuleBasedExtractor)
+    extractor = LLMExtractor()
+    extracted_result = extractor.extract(clean_text)
+
+    # Merge and map to 48 features with field-level confidences
+    mapper = ResumeFeatureMapper()
+    merged_profile, mapped_features, confidences, _ = mapper.merge_and_map(
+        extracted=extracted_result,
+        manual_profile=manual_data,
+    )
+
+    return {
+        "extraction_method": extracted_result.extraction_method,
+        "extracted_skills": extracted_result.skills,
+        "extracted_domains": extracted_result.domains,
+        "projects_count": extracted_result.projects_count,
+        "certifications_count": extracted_result.certifications_count,
+        "cgpa_hint": extracted_result.cgpa_hint,
+        "experience_level": extracted_result.experience_level,
+        "mapped_features": mapped_features,
+        "confidences": confidences,
+        "merged_profile": merged_profile,
+    }
+
+
+@app.post(
+    "/api/v1/recommend/from-resume",
+    response_model=RecommendationResponse,
+    status_code=status.HTTP_200_OK,
+    tags=["Recommendation"],
+)
+async def recommend_from_student_resume(
+    request: Request,
+    file: Optional[UploadFile] = File(None, description="Uploaded resume file (PDF, DOCX, or TXT)"),
+    text: Optional[str] = Form(None, description="Pasted resume raw text"),
+    manual_profile: Optional[str] = Form(None, description="Optional manual student profile JSON string"),
+    explain: bool = Query(False, description="When true, attaches TreeSHAP feature contributions"),
+    top_k: int = Query(3, ge=1, le=7, description="Number of top recommendations to return"),
+) -> Dict[str, Any]:
+    """
+    End-to-end pipeline: extracts competencies from resume (file or text), merges with
+    manual student profile inputs (manual wins on conflict), and runs the Random Forest
+    recommendation engine to return ranked technology stacks (with optional TreeSHAP explanations).
+    """
+    try:
+        predictor = TechStackPredictor.get_instance()
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Recommendation model unavailable: {str(e)}",
+        )
+
+    clean_text, manual_data = await _extract_resume_content(
+        request=request,
+        file=file,
+        text=text,
+        manual_profile=manual_profile,
+    )
+
+    extractor = LLMExtractor()
+    extracted_result = extractor.extract(clean_text)
+
+    mapper = ResumeFeatureMapper()
+    merged_profile, mapped_features, _, _ = mapper.merge_and_map(
+        extracted=extracted_result,
+        manual_profile=manual_data,
+    )
+
+    try:
+        result = predictor.predict_for_student(merged_profile, top_k=top_k)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Inference error: {str(e)}",
+        )
+
+    if explain:
+        try:
+            shap_explainer = ShapExplainer.get_instance()
+            shap_exps = shap_explainer.explain_student(merged_profile, top_k=top_k)
+            shap_map = {item["stack_code"]: item["explanation"] for item in shap_exps}
+
+            if result.get("primary_recommendation"):
+                st_code = result["primary_recommendation"]["stack_code"]
+                if st_code in shap_map:
+                    result["primary_recommendation"]["explanation"] = shap_map[st_code]
+
+            for item in result.get("alternative_recommendations", []):
+                st_code = item["stack_code"]
+                if st_code in shap_map:
+                    item["explanation"] = shap_map[st_code]
+
+            for item in result.get("all_ranked_stacks", []):
+                st_code = item["stack_code"]
+                if st_code in shap_map:
+                    item["explanation"] = shap_map[st_code]
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"SHAP explanation error: {str(e)}",
+            )
+
+    result["recommendations"] = result.get("all_ranked_stacks", [])
+    return result

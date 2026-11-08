@@ -135,7 +135,7 @@ personalized technology-stack recommendation.
 | **Sprint 1** | Requirement Analysis & Architecture | 10/08/26 – 22/08/26 | ✅ **Completed**: System Architecture (`docs/system-architecture.md`), SRS Specification (`docs/srs-requirements.md`), ERP & Microservice Contracts. |
 | **Sprint 2** | Data Collection & Preparation | 23/08/26 – 30/09/26 | ✅ **Completed**: 48-feature extraction pipeline (`model/preprocessing/`), 1,000-record dataset (`model/data/student_tech_stack_dataset.csv`), Data Dictionary (`docs/dataset-and-features.md`), Isolated Test Fixtures (`model/data/sample_student_profiles.json`). |
 | **Sprint 3** | Tech Stack Prediction Model | 01/10/26 – 31/10/26 | ✅ **Completed**: Random Forest recommendation model (`model/training/train.py`), Top-K ranking engine (`model/recommendation/predictor.py`), FastAPI service (`ai-service/app/main.py`), automated test suite (`tests/`), Technical Docs (`docs/model-documentation.md`). |
-| **Sprint 4** | Resume Parsing & Explainability | 01/11/26 – 02/01/27 | ✅ **Completed**: TreeSHAP explainability engine (`model/explainability/shap_explainer.py`), multi-class attribution extraction, human-readable feature labels (`labels.py`), global SHAP feature importance, PDF/DOCX resume text extraction (`pypdf`, `python-docx`), LLM skill extractor with deterministic taxonomy fallback (`app/resume/`), 48-feature mapper with manual conflict resolution, FastAPI endpoints (`/api/v1/explain`, `/api/v1/resume/parse`, `/api/v1/explain/global-importance`), 95 passing automated tests (`pytest -v`), Technical Docs (`docs/explainability-and-resume.md`). |
+| **Sprint 4** | Resume Parsing & Explainability | 01/11/26 – 02/01/27 | 🔄 **In Progress (AI/ML Core Completed)**:<br>• ✅ **TreeSHAP Explainability**: Singleton `ShapExplainer` (`model/explainability/shap_explainer.py`), additive feature attributions, plain-English summary generator, human-readable labels (`labels.py`), global SHAP importance API (`/api/v1/explain/global-importance`).<br>• ✅ **Resume Extraction Pipeline**: `model/resume/` with `skills_taxonomy.json` mapping 31 skills and 7 domains; dual extractors (`RuleBasedExtractor` default offline deterministic & `LLMExtractor` with automatic fallback); in-memory ingestion of `.pdf`, `.docx`, `.txt`, and pasted text with strict 5MB limit and zero disk persistence.<br>• ✅ **Feature Mapper & Precedence Rule**: Manually declared student inputs strictly override resume extractions; defensive pipeline default imputation; field-level confidence scores `[0.0, 1.0]`.<br>• ✅ **FastAPI Microservice Endpoints**: `POST /api/v1/resume/extract`, `POST /api/v1/recommend/from-resume`, backward-compatible `POST /api/v1/resume/parse`, `POST /api/v1/recommend?explain=true`, `POST /api/v1/explain`.<br>• ✅ **Evaluation for Research Paper**: `scripts/generate_evaluation_report.py` executing 5-fold CV, confusion matrix, top 15 Gini features, SHAP per-stack drivers, latency profiles -> `docs/evaluation-report.md`.<br>• ✅ **Test Suite**: 113 automated unit, integration, and QA tests passing (`pytest -v`).<br>• ⏳ **Remaining in Sprint 4**: Node.js Gateway & React frontend ingestion integration (Lakshya / Prachi). |
 | **Sprint 5** | Backend API System Integration | 03/01/27 – 20/02/27 | ⏳ *Planned Future Work*: Node.js gateway integration with FastAPI. |
 | **Sprint 6** | System Testing & Deployment | 21/02/27 – 15/03/27 | ⏳ *Planned Future Work*: End-to-end integration testing and deployment. |
 
@@ -185,13 +185,16 @@ python -m model.training.train --n-estimators 100 --max-depth 15
 
 # Evaluate with 5-fold cross validation
 python -m model.training.evaluate --cv
+
+# Generate research paper evaluation report (5-fold CV, confusion matrix, SHAP, latency)
+python scripts/generate_evaluation_report.py
 ```
 
 ### 3. Run Automated Tests
 ```bash
 pytest -v
 ```
-*Current test suite: **95 passing tests** across preprocessing, prediction, evaluation, API schemas, TreeSHAP explainability, and resume parsing.*
+*Current test suite: **113 passing tests** across preprocessing, prediction, evaluation, API schemas, TreeSHAP explainability, QA safety invariants, and resume extraction.*
 
 ### 4. Run AI Recommendation Microservice
 ```bash
@@ -204,5 +207,9 @@ uvicorn --app-dir ai-service app.main:app --host 0.0.0.0 --port 8000 --reload
 - Recommendation Endpoint with TreeSHAP Explanations: `POST http://localhost:8000/api/v1/recommend?explain=true`
 - Dedicated TreeSHAP Explanation Endpoint: `POST http://localhost:8000/api/v1/explain`
 - Global SHAP Feature Importance: `GET http://localhost:8000/api/v1/explain/global-importance`
-- Resume Parsing & 48-Feature Ingestion: `POST http://localhost:8000/api/v1/resume/parse`
-- Sprint 4 Technical Documentation: [`docs/explainability-and-resume.md`](docs/explainability-and-resume.md)
+- Resume Competency Extraction & 48-Feature Mapping: `POST http://localhost:8000/api/v1/resume/extract`
+- End-to-End Recommendation from Resume: `POST http://localhost:8000/api/v1/recommend/from-resume`
+- Legacy Resume Parsing Endpoint (Backward Compatible): `POST http://localhost:8000/api/v1/resume/parse`
+- Explainability API Contract: [`docs/explainability-api-contract.md`](docs/explainability-api-contract.md)
+- Resume Extraction API Contract: [`docs/resume-extraction-api-contract.md`](docs/resume-extraction-api-contract.md)
+- Evaluation & Benchmark Report: [`docs/evaluation-report.md`](docs/evaluation-report.md)
