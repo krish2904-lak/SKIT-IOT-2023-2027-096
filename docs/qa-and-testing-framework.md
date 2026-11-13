@@ -3,8 +3,8 @@
 **Author & QA Lead:** Saloni Jain (Data & Testing)  
 **Project ID:** SKIT/DS/2023-2027/CSE-F-096  
 **Mentor:** Dr. Archika Jain  
-**Current Date:** October 29, 2026  
-**Version:** 1.3.0 — Sprint 3 Week 8 Validation Pass  
+**Current Date:** November 13, 2026  
+**Version:** 1.4.0 — Sprint 4 Week 10 Validation Pass  
 
 ---
 
@@ -19,6 +19,7 @@ This document specifies the Quality Assurance (QA) and testing framework develop
 6. **Structured Learning Roadmaps**: Invariant schema auditing across 3-phase structured roadmaps for all 7 tech stack categories.
 7. **Resume Ingestion & Buffer Isolation QA**: Zero-disk persistence, file format boundaries, corrupted stream rejection, and PII safety invariants.
 8. **Resume Feature Mapping & Conflict Resolution QA**: Canonical taxonomy mapping into 48-dimensional float vectors, "Manual Wins" precedence rules, and verified ERP score preservation.
+9. **Model Evaluation & Empirical Benchmark QA**: Invariant auditing for 5-fold cross-validation metrics, multi-class confusion matrix, Gini feature importance rankings, TreeSHAP signed attributions, and sub-50ms inference latency SLA compliance.
 
 ---
 
@@ -38,8 +39,9 @@ This document specifies the Quality Assurance (QA) and testing framework develop
 │ test_roadmap_qa.py       │ 3-Phase Roadmaps    │ 3 / 3        │
 │ test_resume_qa.py        │ Ingestion & Safety  │ 5 / 5        │
 │ test_resume_mapping_qa.py│ Mapping & Precedence│ 5 / 5        │
+│ test_model_evaluation_qa.py│ Evaluation & Benchmarks│ 6 / 6    │
 ├──────────────────────────┼─────────────────────┼──────────────┤
-│ TOTAL                    │ Full Pipeline QA    │ 37 / 37      │
+│ TOTAL                    │ Full Pipeline QA    │ 43 / 43      │
 └──────────────────────────┴─────────────────────┴──────────────┘
 ```
 
@@ -95,6 +97,14 @@ This document specifies the Quality Assurance (QA) and testing framework develop
 - **ERP Score Preservation:** Ensures verified institutional marks and CGPA cannot be modified or diluted by resume contents.
 - **Sparse Fallback Invariance:** Confirms empty or non-technical resumes produce safe default feature vectors without NaNs or runtime errors.
 - **Inference Pipeline Compatibility:** Validates merged profiles integrate directly with recommendation ranking and 3-phase roadmap engines.
+
+### 3.9 Model Evaluation & Empirical Benchmark QA (`tests/test_model_evaluation_qa.py`)
+- **Cross-Validation Invariants:** Validates that 5-fold cross-validation accuracy and macro F1-score achieve $\ge 0.95$ (observed $1.0000 \pm 0.0000$) with variance $\le 0.05$.
+- **Confusion Matrix Mathematics:** Asserts $7 \times 7$ dimensionality, non-negativity across all cells, diagonal support summing to 200 holdout records, and zero misclassifications in empirical benchmark.
+- **Gini Feature Importance Hierarchy:** Audits the Top-15 features (led by `skill_pytorch` $0.0702$, `skill_kubernetes` $0.0598$, `skill_flutter` $0.0517$) for positive bounded weights $\in (0.0, 1.0]$ and monotonic rank ordering.
+- **TreeSHAP Attribution Boundaries:** Confirms signed impacts preserve mathematical directionality ($E[|\phi|] > 0$, signed impact bounded in $[-1.0, 1.0]$).
+- **Latency SLA Benchmarking:** Enforces sub-50ms mean prediction latency (observed $29.25\text{ ms}$), sub-10ms SHAP latency (observed $1.40\text{ ms}$), and sub-120ms full pipeline SLA (observed $30.65\text{ ms}$).
+- **Synthetic Dataset Distribution Invariants:** Verifies 1,000 records across 48 dimensions maintain uniform class representation ($\sim 14.2\%$ per stack).
 
 ---
 

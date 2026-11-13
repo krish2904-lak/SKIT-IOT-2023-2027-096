@@ -2,7 +2,7 @@
 Automated QA Test Runner & Verification Suite
 Author: Saloni Jain (Data & Testing Lead)
 Project: AI-Based Tech-Stack Recommendation with ERP Integration (SKIT-IOT-2023-2027-096)
-Sprint: Sprint 3 / Week 8 Unified Test Pass
+Sprint: Sprint 4 / Week 10 Unified Test Pass
 """
 
 import sys
@@ -21,13 +21,13 @@ def run_tests_native():
     print("=" * 70)
     print("  SKIT-IOT-2023-2027-096: AUTOMATED QA & TESTING SUITE")
     print("  Lead: Saloni Jain (Data & Testing)")
-    print("  Sprint 3 / Week 8: Full Pipeline & Resume Ingestion QA Pass")
+    print("  Sprint 4 / Week 10: Model Evaluation & End-to-End System QA Pass")
     print("=" * 70)
 
     start_total = time.perf_counter()
 
     # 1. Test Dataset Schema
-    print("\n[SUITE 1/8] Running Dataset Schema & Invariant Tests...")
+    print("\n[SUITE 1/9] Running Dataset Schema & Invariant Tests...")
     from tests.test_dataset_schema import TestDatasetSchema
     schema_suite = TestDatasetSchema()
     
@@ -58,7 +58,7 @@ def run_tests_native():
     print("  -> 4/4 schema invariant checks PASSED.")
 
     # 2. Test Preprocessing Pipeline
-    print("\n[SUITE 2/8] Running Preprocessing QA Tests...")
+    print("\n[SUITE 2/9] Running Preprocessing QA Tests...")
     from tests.test_preprocessing_qa import TestStudentDataPreprocessor
     preproc_suite = TestStudentDataPreprocessor()
     preproc_suite.test_academic_score_normalization()
@@ -69,7 +69,7 @@ def run_tests_native():
     print("  -> 5/5 preprocessing unit checks PASSED.")
 
     # 3. Test Model Inference QA
-    print("\n[SUITE 3/8] Running Model Inference & Latency Benchmark Tests...")
+    print("\n[SUITE 3/9] Running Model Inference & Latency Benchmark Tests...")
     from tests.test_model_inference_qa import TestModelInferenceQA
     model_suite = TestModelInferenceQA()
     model_suite.test_prediction_output_structure(mock_erp, mock_student)
@@ -80,7 +80,7 @@ def run_tests_native():
     print("  -> 5/5 model inference & latency benchmark checks PASSED.")
 
     # 4. Test API Integration QA
-    print("\n[SUITE 4/8] Running API Contract Integration & Edge Case Tests...")
+    print("\n[SUITE 4/9] Running API Contract Integration & Edge Case Tests...")
     from tests.test_api_integration_qa import TestApiIntegrationQA
     api_suite = TestApiIntegrationQA()
     api_suite.test_mock_recommendation_response_contract()
@@ -91,7 +91,7 @@ def run_tests_native():
     print("  -> 5/5 API contract & boundary checks PASSED.")
 
     # 5. Test Explainability & SHAP Attributions QA
-    print("\n[SUITE 5/8] Running Explainability (SHAP) QA Tests...")
+    print("\n[SUITE 5/9] Running Explainability (SHAP) QA Tests...")
     from tests.test_explainability_qa import TestExplainabilityQA
     expl_suite = TestExplainabilityQA()
     expl_suite.setUp()
@@ -103,7 +103,7 @@ def run_tests_native():
     print("  -> 5/5 explainability & attribution invariant checks PASSED.")
 
     # 6. Test 3-Phase Structured Learning Roadmaps QA
-    print("\n[SUITE 6/8] Running 3-Phase Structured Roadmap QA Tests...")
+    print("\n[SUITE 6/9] Running 3-Phase Structured Roadmap QA Tests...")
     from tests.test_roadmap_qa import TestRoadmapQA
     roadmap_suite = TestRoadmapQA()
     roadmap_suite.setUp()
@@ -113,7 +113,7 @@ def run_tests_native():
     print("  -> 3/3 roadmap structural & phase invariant checks PASSED.")
 
     # 7. Test Resume Ingestion & Buffer Safety QA
-    print("\n[SUITE 7/8] Running Resume Ingestion & Buffer Safety QA Tests...")
+    print("\n[SUITE 7/9] Running Resume Ingestion & Buffer Safety QA Tests...")
     from tests.test_resume_qa import TestResumeQA
     resume_qa_suite = TestResumeQA()
     resume_qa_suite.setUp()
@@ -125,7 +125,7 @@ def run_tests_native():
     print("  -> 5/5 resume ingestion & safety checks PASSED.")
 
     # 8. Test Resume Feature Mapping & Conflict Resolution QA
-    print("\n[SUITE 8/8] Running Resume Feature Mapping & Conflict Resolution QA Tests...")
+    print("\n[SUITE 8/9] Running Resume Feature Mapping & Conflict Resolution QA Tests...")
     from tests.test_resume_mapping_qa import TestResumeMappingQA
     mapping_qa_suite = TestResumeMappingQA()
     mapping_qa_suite.setUp()
@@ -136,12 +136,25 @@ def run_tests_native():
     mapping_qa_suite.test_end_to_end_prediction_compatibility_with_merged_profile()
     print("  -> 5/5 resume feature mapping & conflict resolution checks PASSED.")
 
+    # 9. Test Model Evaluation & Empirical Benchmark QA
+    print("\n[SUITE 9/9] Running Model Evaluation & Benchmark Invariant QA Tests...")
+    from tests.test_model_evaluation_qa import TestModelEvaluationQA
+    eval_qa_suite = TestModelEvaluationQA()
+    eval_qa_suite.setUp()
+    eval_qa_suite.test_evaluation_metrics_and_accuracy_invariants()
+    eval_qa_suite.test_confusion_matrix_invariants()
+    eval_qa_suite.test_feature_importance_hierarchy_invariants()
+    eval_qa_suite.test_treeshap_attribution_directionality_and_bounds()
+    eval_qa_suite.test_latency_sla_benchmarks()
+    eval_qa_suite.test_dataset_distribution_and_balance_invariants()
+    print("  -> 6/6 model evaluation & benchmark invariant checks PASSED.")
+
     total_time = (time.perf_counter() - start_total) * 1000
     print("\n" + "=" * 70)
-    print(f"  SUMMARY: 37/37 QA TESTS PASSED SUCCESSFULLY (100% PASS RATE)")
+    print(f"  SUMMARY: 43/43 QA TESTS PASSED SUCCESSFULLY (100% PASS RATE)")
     print(f"  Execution Time: {total_time:.2f} ms")
     print("  Status: All dataset, preprocessor, model inference, API, explainability,")
-    print("          roadmap, resume ingestion & conflict resolution checks verified.")
+    print("          roadmap, resume ingestion, conflict resolution & evaluation benchmark checks verified.")
     print("=" * 70)
     return 0
 
