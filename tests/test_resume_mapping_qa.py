@@ -24,6 +24,9 @@ class TestResumeMappingQA:
     48-dimensional vector invariance, and the 'Manual Wins' conflict resolution rule.
     """
 
+    def setup_method(self):
+        self.setUp()
+
     def setUp(self):
         self.preprocessor = StudentDataPreprocessor()
         self.canonical_features = self.preprocessor.get_feature_names()

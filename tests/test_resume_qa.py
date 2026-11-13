@@ -55,6 +55,9 @@ class TestResumeQA:
     in-memory buffer isolation, format validation, and safety invariants.
     """
 
+    def setup_method(self):
+        self.setUp()
+
     def setUp(self):
         self.sample_text = (
             "Saloni Jain\n"
